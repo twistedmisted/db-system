@@ -24,3 +24,15 @@ This project is a web-based application for managing databases, tables, and prov
 - 
 ### Frontend:
 - **Angular 17:** For building the user interface and managing dynamic forms for interacting with databases and tables.
+
+## Installation
+
+### Server
+1. Open 'server' folder in the terminal
+2. Run command:`docker-compose up`
+3. Now you can access to the server using `http://localhost:8080`
+4. Everything done
+
+### Client
+1. Run `ng serve` for a dev server. 
+2. Navigate to `http://localhost:4200/`.
