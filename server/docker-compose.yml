@@ -1,0 +1,37 @@
+version: '3.6'
+services:
+  iris:
+    container_name: my-iris
+    image: intersystemsdc/iris-community
+    restart: always
+    command: --check-caps false
+    ports:
+      - "9092:52773"
+      - "9091:1972"
+    environment:
+      IRIS_USERNAME: _SYSTEM
+      IRIS_PASSWORD: PASSWORD
+    healthcheck:
+      test: iris terminal IRIS
+      interval: 1s
+      timeout: 3s
+      retries: 30
+  redis:
+    image: redis:latest
+    restart: always
+    ports:
+      - "6379:6379"
+    environment:
+      - REDIS_PASSWORD=PASSWORD
+      - REDIS_PORT = 6379
+      - REDIS_DATABASE = 16
+#  app:
+#    container_name: quiz-app
+#    depends_on:
+#      iris:
+#        condition: service_healthy
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+#    ports:
+#      - '8080:8080'

@@ -1,0 +1,246 @@
+@ username = testuser
+@ password = testpassword
+
+### REGISTRATION
+POST {{host}}/auth/register
+Accept: application/json
+Content-Type: application/json
+
+{
+  "firstName": "User",
+  "lastName": "Test",
+  "username": "{{username}}",
+  "email": "testuser@gmail.com",
+  "password": "{{password}}"
+}
+
+### LOGIN
+POST {{host}}/auth/login
+Accept: application/json
+Content-Type: application/json
+
+{
+  "username": "{{username}}",
+  "password": "{{password}}"
+}
+
+> {% client.global.set("token", 'Bearer ' + response.body.accessToken) %}
+
+### VALIDATE TOKEN
+GET {{host}}/auth/validate-token
+Authorization: {{token}}
+
+### LOGOUT
+POST {{host}}/auth/logout
+Authorization: {{token}}
+
+### GET USER BY PRINCIPAL
+GET {{host}}/users/me
+Authorization: {{token}}
+
+### CREATE DATABASE
+POST {{host}}/dbs
+Accept: application/json
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "dbName": "first",
+  "tokenLifeTime": "WEEK"
+}
+
+### GET DATABASES
+GET {{host}}/dbs?pageNum=0&pageSize=1000
+Accept: application/json
+Content-Type: application/json
+Authorization: {{token}}
+
+### GET DATABASE
+@ dbId = 1
+GET {{host}}/dbs/{{dbId}}
+Accept: application/json
+Authorization: {{token}}
+
+### DELETE DATABASE
+DELETE {{host}}/dbs/{{dbId}}
+Accept: application/json
+Authorization: {{token}}
+
+### UPDATE DB TOKEN
+POST {{host}}/dbTokens
+Accept: application/json
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "dbId": {{dbId}},
+  "lifeTime": "YEAR"
+}
+
+### GET DB TOKEN
+GET {{host}}/dbTokens/{{dbId}}
+Authorization: {{token}}
+
+> {% client.global.set("dbToken", 'Bearer ' + response.body.token) %}
+
+### CREATE TABLE
+POST {{host}}/tables
+Accept: application/json
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "dbId": {{dbId}},
+  "name": "firstTable",
+  "columns": [
+  {
+    "name": "id",
+    "type": {
+    "type": "BIGINT"
+    },
+    "settings": [
+    {
+    "value": "PRIMARY_KEY",
+    "statusValue": true
+    },
+    {
+    "value": "IDENTITY",
+    "statusValue": true
+    }
+    ]
+  },
+  {
+  "name": "name",
+  "type": {
+  "type": "VARCHAR",
+  "value": "50"
+  },
+  "settings": [
+  {
+  "value": "NULLABLE",
+  "statusValue": false
+  },
+  {
+  "value": "UNIQUE",
+  "statusValue": true
+  }
+  ]
+  }
+  ]
+}
+
+### GET ALL TABLES BY DB ID
+GET {{host}}/tables/db/{{dbId}}
+Content-Type: application/json
+Authorization: {{token}}
+
+### GET TABLE BY ID
+@ tableId = 3
+GET {{host}}/tables/{{tableId}}
+Accept: application/json
+Authorization: {{token}}
+
+### UPDATE TABLE NAME BY ID
+PUT {{host}}/tables
+Accept: application/json
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "id": {{tableId}},
+  "name": "testUpdateName"
+}
+
+### DELETE TABLE BY ID
+DELETE {{host}}/tables/{{tableId}}
+Authorization: {{token}}
+
+### ADD NEW COLUMN BY TABLE ID
+PUT {{host}}/tables/{{tableId}}/addColumn
+Accept: application/json
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "name": "testAddedColumn",
+  "type": {
+    "type": "TIMESTAMP"
+  },
+  "settings": [
+    {
+      "value": "NULLABLE",
+      "statusValue": false
+    }
+  ]
+}
+
+### DELETE COLUMN BY TABLE ID AND COLUMN NAME
+PUT {{host}}/tables/{{tableId}}/deleteColumn
+Accept: application/json
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "name": "testAddedColumn"
+}
+
+### GET DATA BY COLUMN AND TABLE NAME
+GET {{host}}/queries/firstTable/getByColumn
+Accept: application/json
+Content-Type: application/json
+Authorization: {{dbToken}}
+
+{
+  "columnName": "id",
+  "value": 2
+}
+
+### GET ALL DATA BY TABLE NAME
+GET {{host}}/queries/firstTable/getAll
+Accept: application/json
+Authorization: {{dbToken}}
+
+### SAVE DATA BY TABLE NAME
+POST {{host}}/queries/firstTable/save
+Accept: application/json
+Content-Type: application/json
+Authorization: {{dbToken}}
+
+{
+  "name": "name from query 03"
+}
+
+### UPDATE DATA BY CONDITON
+PUT {{host}}/queries/firstTable/update
+Accept: application/json
+Content-Type: application/json
+Authorization: {{dbToken}}
+
+{
+  "condition": {
+    "columnName": "id",
+    "operator": "EQUALS",
+    "value": 3
+  },
+  "object": {
+    "name": "name from"
+  }
+}
+
+### DELETE DATA BY CONDITION
+DELETE {{host}}/queries/firstTable/delete
+Accept: application/json
+Content-Type: application/json
+Authorization: {{dbToken}}
+
+{
+  "columnName": "id",
+  "operator": "EQUALS",
+  "value": "10"
+}
+
+### GET ALL FIELD TYPES
+GET http://localhost:8080/fieldTypes
+
+### GET ALL CONSTAINTS
+GET http://localhost:8080/constraints
