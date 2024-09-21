@@ -1,0 +1,99 @@
+<form [formGroup]="form" class="col-lg-6 offset-lg-3" (ngSubmit)="submit()">
+  <div class="jsutify-content-center">
+    <div class="mb-3">
+      <label for="exampleInputEmail1" class="form-label">Table Name</label>
+      <input formControlName="name" class="form-control" id="tableName" />
+    </div>
+    <hr />
+    <h5 class="text-center">Fields</h5>
+    <div formArrayName="columns">
+      <div
+        *ngFor="let column of columns.controls; let i = index"
+        [formGroupName]="i"
+        class="m-3"
+      >
+        <div class="d-flex gap-2 mb-1">
+          <div class="d-flex gap-2 w-50">
+            <input
+              id="columnName-{{ i }}"
+              formControlName="name"
+              placeholder="Enter column name"
+              class="form-control w-100"
+            />
+          </div>
+          <div class="d-flex gap-2 w-50" formGroupName="columnType">
+            <select
+              class="form-select w-50"
+              formControlName="type"
+              [value]="['change']"
+            >
+              <option value="" disabled selected>Choose field type</option>
+              <option
+                *ngFor="let fieldType of fieldTypes$ | async"
+                [value]="fieldType"
+              >
+                {{ fieldType }}
+              </option>
+            </select>
+            <input
+              id="columnType-{{ i }}"
+              formControlName="value"
+              placeholder="Enter column type param"
+              class="form-control w-50"
+            />
+          </div>
+        </div>
+        <div class="mb-1">
+          <button
+            class="btn btn-secondary w-100"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#collapseExample"
+            aria-expanded="false"
+            aria-controls="collapseExample"
+          >
+            <i class="bi bi-arrow-down-circle"></i> Constraints
+          </button>
+          <div class="collapse" id="collapseExample">
+            <div
+              formArrayName="columnConstraints"
+              class="form-check"
+              *ngFor="let constraint of constraints; let i = index"
+            >
+              <input
+                class="form-check-input"
+                type="checkbox"
+                [formControlName]="i"
+              />
+              <span class="form-check-label">
+                {{ constraint.value }}
+              </span>
+            </div>
+          </div>
+        </div>
+        <button
+          type="button"
+          class="btn btn-danger mb-3 w-100"
+          (click)="removeColumn(i)"
+        >
+          <i class="bi bi-dash-circle"></i>
+        </button>
+        <hr />
+      </div>
+    </div>
+    <div class="w-100 text-center">
+      <button
+        class="btn btn-primary mb-3 w-50"
+        type="button"
+        (click)="addColumn()"
+      >
+        <i class="bi bi-plus-circle"></i> Add Column
+      </button>
+    </div>
+  </div>
+  <div class="text-center">
+    <button class="btn btn-success" type="submit">
+      <i class="bi bi-check-circle"></i> Create Table
+    </button>
+  </div>
+</form>

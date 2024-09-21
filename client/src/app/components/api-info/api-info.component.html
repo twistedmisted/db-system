@@ -1,0 +1,193 @@
+<div class="accordion" id="apiAccordion">
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="headingGetByField">
+      <button
+        class="accordion-button collapsed"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#collapseGetByField"
+        aria-expanded="true"
+        aria-controls="collapseGetByField"
+      >
+        Get by Field
+      </button>
+    </h2>
+    <div
+      id="collapseGetByField"
+      class="accordion-collapse collapse"
+      aria-labelledby="headingGetByField"
+      data-bs-parent="#apiAccordion"
+    >
+      <div class="accordion-body">
+        <h6>URL:</h6>
+        <code>GET {{ getByFieldLink }}</code>
+        <h6>Header:</h6>
+        <code>'Authorization': &#123;yours access token&#125;</code>
+        <h6>General Request Example :</h6>
+        <pre>
+<code>
+&#123;
+    "columnName": &#123;column name&#125;,
+    "value": &#123;value&#125;
+&#125;
+</code>
+        </pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="headingGetAll">
+      <button
+        class="accordion-button collapsed"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#collapseGetAll"
+        aria-expanded="false"
+        aria-controls="collapseGetAll"
+      >
+        Get All
+      </button>
+    </h2>
+    <div
+      id="collapseGetAll"
+      class="accordion-collapse collapse"
+      aria-labelledby="headingGetAll"
+      data-bs-parent="#apiAccordion"
+    >
+      <div class="accordion-body">
+        <h6>URL:</h6>
+        <code>GET {{ getAllLink }}</code>
+        <h6>Header:</h6>
+        <code>'Authorization': &#123;yours access token&#125;</code>
+        <h6>General Request Example :</h6>
+        <pre>
+<code>
+N/A (No request body required)
+</code>
+        </pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="headingCreate">
+      <button
+        class="accordion-button collapsed"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#collapseCreate"
+        aria-expanded="false"
+        aria-controls="collapseCreate"
+      >
+        Create
+      </button>
+    </h2>
+    <div
+      id="collapseCreate"
+      class="accordion-collapse collapse"
+      aria-labelledby="headingCreate"
+      data-bs-parent="#apiAccordion"
+    >
+      <div class="accordion-body">
+        <h6>URL:</h6>
+        <code>POST {{ createLink }}</code>
+        <h6>Header:</h6>
+        <code>'Authorization': &#123;yours access token&#125;</code>
+        <h6>General Request Example :</h6>
+        <pre>
+<code>
+&#123;
+    "columnName1": &#123;value1&#125;,
+    ...
+    "columnNameN": &#123;valueN&#125;
+&#125;
+</code>
+        </pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="headingUpdateByField">
+      <button
+        class="accordion-button collapsed"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#collapseUpdateByField"
+        aria-expanded="false"
+        aria-controls="collapseUpdateByField"
+      >
+        Update by Field
+      </button>
+    </h2>
+    <div
+      id="collapseUpdateByField"
+      class="accordion-collapse collapse"
+      aria-labelledby="headingUpdateByField"
+      data-bs-parent="#apiAccordion"
+    >
+      <div class="accordion-body">
+        <h6>URL:</h6>
+        <code>PUT {{ updateLink }}</code>
+        <h6>Header:</h6>
+        <code>'Authorization': &#123;yours access token&#125;</code>
+        <h6>General Request Example :</h6>
+        <pre>
+<code>
+&#123;
+    "condition": &#123;
+        "columnName": &#123;columnName&#125;,
+        "value": &#123;value&#125;,
+        "operator": &#123;One of: EQUALS, NOT EQUALS, GREATER, LOWER &#125;
+    &#125;,
+    "object": &#123;
+        "columnName1": &#123;value1&#125;,
+        ...
+        "columnNameN": &#123;valueN&#125;
+    &#125;
+&#125;
+</code>
+        </pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="headingDeleteByField">
+      <button
+        class="accordion-button collapsed"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#collapseDeleteByField"
+        aria-expanded="false"
+        aria-controls="collapseDeleteByField"
+      >
+        Delete by Field
+      </button>
+    </h2>
+    <div
+      id="collapseDeleteByField"
+      class="accordion-collapse collapse"
+      aria-labelledby="headingDeleteByField"
+      data-bs-parent="#apiAccordion"
+    >
+      <div class="accordion-body">
+        <h6>URL:</h6>
+        <code>DELETE {{ deleteLink }}</code>
+        <h6>Header:</h6>
+        <code>'Authorization': &#123;yours access token&#125;</code>
+        <h6>General Request Example :</h6>
+        <pre>
+<code>
+&#123;
+    "columnName": &#123;columnName&#125;,
+    "value": &#123;value&#125;,
+    "operator": &#123;One of: EQUALS, NOT EQUALS, GREATER, LOWER &#125;
+&#125;
+</code>
+        </pre>
+      </div>
+    </div>
+  </div>
+</div>

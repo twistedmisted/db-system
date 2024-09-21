@@ -1,0 +1,74 @@
+<div *ngIf="table" class="container mt-5">
+  <div class="mb-3">
+    <button class="btn btn-secondary" onclick="history.back()">Back</button>
+  </div>
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h3 class="card-title">Table Information</h3>
+      <div>
+        <button class="btn btn-primary me-2" [routerLink]="['edit']">
+          Update Table Name
+        </button>
+        <button class="btn btn-danger" (click)="deleteTableById(table.id!)">
+          Remove Table
+        </button>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="mb-4 d-flex justify-content-between align-items-center">
+        <h4>
+          Table Name: <span class="text-primary">{{ table.name }}</span>
+        </h4>
+      </div>
+
+      <div class="mb-3 text-end">
+        <button class="btn btn-success" [routerLink]="['columns/new']">
+          Add New Column
+        </button>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-bordered">
+          <thead class="thead-light">
+            <tr>
+              <th>Column Name</th>
+              <th>Column Type</th>
+              <th>Constraints</th>
+              <th class="text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              *ngFor="let column of table.columns; let i = index"
+              class="w-100"
+            >
+              <th>{{ column.name }}</th>
+              <td>
+                {{
+                  column.type.type +
+                    (column.type.value ? "(" + column.type.value + ")" : "")
+                }}
+              </td>
+              <td>{{ constraints[i].join(", ") }}</td>
+              <td class="text-center">
+                <button
+                  class="btn btn-sm btn-warning me-2"
+                  [routerLink]="['columns', column.name, 'edit']"
+                >
+                  Update
+                </button>
+                <button
+                  class="btn btn-sm btn-danger"
+                  (click)="deleteColumnByName(column.name)"
+                >
+                  Remove
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <app-api-info [tableName]="table.name"></app-api-info>
+    </div>
+  </div>
+</div>

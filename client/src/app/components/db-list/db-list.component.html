@@ -1,0 +1,53 @@
+<div class="container mt-5">
+  <div class="mb-4">
+    <h1 class="text-center">Databases</h1>
+  </div>
+
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h3 class="card-title">Available Databases</h3>
+      <div>
+        <a class="btn btn-success me-2" [routerLink]="['/add/db']">
+          Create Database
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-bordered">
+          <thead class="thead-light">
+            <tr>
+              <th>Database Name</th>
+              <th class="text-center">Status</th>
+              <th class="text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let db of dbs$ | async">
+              <tr>
+                <td>{{ db.name }}</td>
+                <td class="text-center">
+                  <span
+                    class="badge"
+                    [ngClass]="{
+                      'bg-success': db.status === 'ACTIVE',
+                      'bg-warning': db.status === 'CREATING'
+                    }"
+                    >{{ db.status }}</span
+                  >
+                </td>
+                <td class="text-center">
+                  <a
+                    class="btn btn-sm btn-primary"
+                    [routerLink]="['/dbs', db.id]"
+                    >View</a
+                  >
+                </td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

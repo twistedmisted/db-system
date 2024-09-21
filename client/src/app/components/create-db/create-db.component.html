@@ -1,0 +1,48 @@
+<div class="container mt-5">
+  <div class="mb-3">
+    <button class="btn btn-secondary" onclick="history.back()">Back</button>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Create New Database</h3>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="form" (submit)="submit()">
+        <div class="mb-3">
+          <label for="dbName" class="form-label">Database Name</label>
+          <input
+            type="text"
+            class="form-control"
+            id="dbName"
+            placeholder="Enter database name"
+            formControlName="dbName"
+            required
+          />
+        </div>
+
+        <div class="mb-3">
+          <label for="tokenLifetime" class="form-label"
+            >Access Token Lifetime</label
+          >
+          <select
+            class="form-select"
+            id="tokenLifetime"
+            formControlName="tokenLifeTime"
+            required
+          >
+            <option value="" disabled selected>Choose token life time</option>
+            <option
+              *ngFor="let lifeTime of dbTokenLifeTimes"
+              [value]="lifeTime"
+            >
+              {{ lifeTime }}
+            </option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Create Database</button>
+      </form>
+    </div>
+  </div>
+</div>
