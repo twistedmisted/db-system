@@ -17,6 +17,7 @@ services:
       timeout: 3s
       retries: 30
   redis:
+    container_name: my-redis
     image: redis:latest
     restart: always
     ports:
@@ -25,3 +26,10 @@ services:
       - REDIS_PASSWORD=PASSWORD
       - REDIS_PORT = 6379
       - REDIS_DATABASE = 16
+  server:
+    container_name: multi-db-system
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '8080:8080'

@@ -38,11 +38,7 @@ export class RegisterComponent implements OnInit {
     this.http
       .post('http://localhost:8080/auth/register', this.form.getRawValue())
       .subscribe((res) => {
-        console.log(res);
-        console.log(
-          'https://v17.angular.io/guide/http-request-data-from-server'
-        );
-        this.router.navigate(['/login']);
+        this.router.navigate(['/login']).then(r => window.location.reload());
       });
   }
 }
