@@ -10,6 +10,7 @@ import ua.zxz.multydbsysytem.dto.DbDto;
 import ua.zxz.multydbsysytem.dto.FieldDto;
 import ua.zxz.multydbsysytem.dto.TableDto;
 import ua.zxz.multydbsysytem.entity.TableEntity;
+import ua.zxz.multydbsysytem.exception.WrongDataException;
 import ua.zxz.multydbsysytem.mapper.impl.TableMapper;
 import ua.zxz.multydbsysytem.repository.DbRepository;
 import ua.zxz.multydbsysytem.repository.TableRepository;
@@ -81,7 +82,10 @@ public class TableServiceImpl implements TableService {
     @Override
     public void create(TablePayload table, String username) {
         if (!dbService.userHasRightsToDb(table.getDbId(), username)) {
-            throw new ResponseStatusException(BAD_REQUEST, "Can't create table, something went wrong");
+            throw new WrongDataException("Can't create table, something went wrong");
+        }
+        if (dbService.dbAlreadyHasTableWithName(table.getDbId(), table.getName())) {
+            throw new WrongDataException("The table with name " + table.getName() + " already exists in this database");
         }
         DbDto dbDto = dbService.getById(table.getDbId());
         TableEntity tableEntity = new TableEntity();

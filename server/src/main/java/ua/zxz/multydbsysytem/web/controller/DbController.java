@@ -61,10 +61,7 @@ public class DbController {
         DbDto dbDto = new DbDto();
         dbDto.setId(id);
         dbDto.setName(dbCreateRequest.getDbName());
-        dbDto.setStatus(dbCreateRequest.getDbStatus());
-        dbDto.setCreatedAt(new Timestamp(System.currentTimeMillis()));
         dbDto.setUser(new UserDto(principal.getName()));
-        dbDto.setToken(new DbTokenDto(dbCreateRequest.getTokenLifeTime()));
         dbService.updateDb(dbDto);
         return new ResponseEntity<>(OK);
     }

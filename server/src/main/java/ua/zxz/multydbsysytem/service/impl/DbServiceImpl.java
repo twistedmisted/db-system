@@ -76,6 +76,8 @@ public class DbServiceImpl implements DbService {
             log.warn("The user = [{}] does not have db with name = [{}]", dbDto.getName(), dbDto.getUser().getUsername());
             throw new ResponseStatusException(BAD_REQUEST, "The user does not have db with name = [" + dbDto.getName() + "]");
         }
+        DbEntity dbEntity = dbRepository.findById(dbDto.getId()).get();
+        dbEntity.setName(dbDto.getName());
         dbRepository.save(dbMapper.dtoToEntity(dbDto));
     }
 
@@ -94,5 +96,10 @@ public class DbServiceImpl implements DbService {
 
     public boolean userHasRightsToDb(long dbId, String username) {
         return dbRepository.existsByIdAndUserUsername(dbId, username);
+    }
+
+    @Override
+    public boolean dbAlreadyHasTableWithName(long dbId, String table) {
+        return dbRepository.existsByIdAndTablesName(dbId, table);
     }
 }

@@ -12,6 +12,7 @@ import { AddColumnComponent } from './components/add-column/add-column.component
 import { CreateDbComponent } from './components/create-db/create-db.component';
 import { DbListComponent } from './components/db-list/db-list.component';
 import { CreateDbTokenComponent } from './components/create-db-token/create-db-token.component';
+import { EditDbComponent } from './components/edit-db/edit-db.component';
 
 export const routes: Routes = [
   {
@@ -29,6 +30,10 @@ export const routes: Routes = [
       {
         path: 'dbs/:id',
         component: DbComponent,
+      },
+      {
+        path: 'dbs/:id/edit',
+        component: EditDbComponent,
       },
       {
         path: 'tables/create',

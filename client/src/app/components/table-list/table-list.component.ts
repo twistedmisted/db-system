@@ -25,9 +25,7 @@ export class TableListComponent implements OnInit {
   ngOnInit(): void {
     this.dbId = this.activatedRoute.snapshot.paramMap.get('id')!;
     this.tableService.getTablesByDbId(this.dbId).subscribe((res) => {
-      console.log(res.result);
       this.tables = res.result;
-      console.log(this.tables);
     });
   }
 }

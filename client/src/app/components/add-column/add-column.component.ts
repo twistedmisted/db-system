@@ -13,11 +13,18 @@ import { FieldTypeService } from '../../service/fieldtype.service';
 import { BehaviorSubject } from 'rxjs';
 import { Constraint } from '../../models/constraint.model';
 import { ColumnService } from '../../service/column.service';
+import { MessageService } from '../../service/message.service';
+import { ErrorBlockComponent } from '../error-block/error-block.component';
 
 @Component({
   selector: 'app-add-column',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    ErrorBlockComponent,
+  ],
   templateUrl: './add-column.component.html',
   styleUrl: './add-column.component.scss',
 })
@@ -31,6 +38,7 @@ export class AddColumnComponent implements OnInit {
     private constraintService: ConstraintService,
     private fieldTypeService: FieldTypeService,
     private columnService: ColumnService,
+    private messageService: MessageService,
     private activatedRoute: ActivatedRoute,
     private formBuilder: FormBuilder,
     private _location: Location
@@ -84,7 +92,7 @@ export class AddColumnComponent implements OnInit {
     });
 
     this.columnService.addColumn(this.tableId, valueToSave).subscribe((res) => {
-      console.log(res);
+      this.messageService.openSuccess(res.message);
       this._location.back();
     });
   }

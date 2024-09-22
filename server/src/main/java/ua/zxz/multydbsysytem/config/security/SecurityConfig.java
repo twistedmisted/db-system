@@ -1,7 +1,7 @@
-package ua.zxz.multydbsysytem.config;
+package ua.zxz.multydbsysytem.config.security;
 
 import jakarta.servlet.DispatcherType;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -14,6 +14,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import ua.zxz.multydbsysytem.config.JwtUserProvider;
 import ua.zxz.multydbsysytem.repository.UserRepository;
 import ua.zxz.multydbsysytem.web.filter.DbTokenRequestFilter;
 import ua.zxz.multydbsysytem.web.filter.JwtUserRequestFilter;
@@ -24,7 +25,6 @@ import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
 
 @Configuration
-@RequiredArgsConstructor
 public class SecurityConfig {
 
     private static final String[] AUTH_WHITELIST = {};
@@ -32,6 +32,18 @@ public class SecurityConfig {
     private final UserRepository userRepository;
     private final JwtUserRequestFilter jwtUserRequestFilter;
     private final DbTokenRequestFilter dbTokenRequestFilter;
+    private final DelegatedAuthenticationEntryPoint delegatedAuthenticationEntryPoint;
+
+    public SecurityConfig(UserRepository userRepository,
+                          JwtUserRequestFilter jwtUserRequestFilter,
+                          DbTokenRequestFilter dbTokenRequestFilter,
+                          @Qualifier("delegatedAuthenticationEntryPoint")
+                          DelegatedAuthenticationEntryPoint entryPoint) {
+        this.userRepository = userRepository;
+        this.jwtUserRequestFilter = jwtUserRequestFilter;
+        this.dbTokenRequestFilter = dbTokenRequestFilter;
+        this.delegatedAuthenticationEntryPoint = entryPoint;
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -59,6 +71,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated())
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(dbTokenRequestFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(c -> c.authenticationEntryPoint(delegatedAuthenticationEntryPoint))
                 .build();
     }
 
@@ -80,6 +93,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated())
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtUserRequestFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(c -> c.authenticationEntryPoint(delegatedAuthenticationEntryPoint))
                 .build();
     }
 }

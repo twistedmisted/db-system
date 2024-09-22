@@ -50,7 +50,7 @@ public class QueryController {
                                          @RequestBody UpdateQueryRequest updateQueryRequest,
                                          Principal principal) {
         queryService.update(Long.parseLong(principal.getName()), tableName, updateQueryRequest);
-        return new ResponseEntity<>("Updated", OK);
+        return new ResponseEntity<>(Map.of("result", "Updated"), OK);
     }
 
     @DeleteMapping("/{tableName}/delete")
@@ -58,6 +58,6 @@ public class QueryController {
                                          @RequestBody Condition condition,
                                          Principal principal) {
         queryService.delete(Long.parseLong(principal.getName()), tableName, condition);
-        return new ResponseEntity<>("Removed", OK);
+        return new ResponseEntity<>(Map.of("result", "Removed"), OK);
     }
 }

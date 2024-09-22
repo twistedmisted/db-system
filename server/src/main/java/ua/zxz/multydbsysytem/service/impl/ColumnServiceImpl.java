@@ -38,7 +38,7 @@ public class ColumnServiceImpl implements ColumnService {
         if (tableRepository.userHasAccessToTable(tableId, username) != 1) {
             throw new ResponseStatusException(BAD_REQUEST, "Can't add new column, something went wrong");
         }
-        jdbcTemplate.update("ALTER TABLE table_" + tableId + " DROP COLUMN " + columnName);
+        jdbcTemplate.update("ALTER TABLE table_" + tableId + " DROP COLUMN " + columnName + " CASCADE;");
     }
 
     @Override

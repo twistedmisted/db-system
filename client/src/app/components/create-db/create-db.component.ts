@@ -1,7 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import {
+  Form,
   FormBuilder,
+  FormControl,
   FormGroup,
   FormsModule,
   ReactiveFormsModule,
@@ -27,25 +29,20 @@ export class CreateDbComponent implements OnInit {
     private dbTokenLifeTimeService: DbTokenLifeTimeService,
     private formBuilder: FormBuilder,
     private router: Router
-  ) {
-    console.log('initing con');
-  }
+  ) {}
 
   ngOnInit(): void {
-    console.log('initing');
     this.initDbTokenLifeTimes();
     this.initForm();
   }
 
   private initDbTokenLifeTimes() {
-    console.log('initing tokines');
     this.dbTokenLifeTimeService.getAll().subscribe((res) => {
       this.dbTokenLifeTimes = res.result;
     });
   }
 
   private initForm() {
-    console.log('initing forms');
     this.form = this.formBuilder.group({
       dbName: [
         '',
@@ -61,8 +58,31 @@ export class CreateDbComponent implements OnInit {
 
   submit() {
     this.dbService.save(this.form.getRawValue()).subscribe((res) => {
-      console.log(res);
       this.router.navigate(['dbs']).then(() => window.location.reload());
     });
+  }
+
+  validate(formControl: FormControl): boolean {
+    return formControl.invalid && (formControl.dirty || formControl.touched);
+  }
+
+  isRequired(formContol: FormControl): boolean {
+    return formContol.errors?.['required'];
+  }
+
+  invMinLength(formControl: FormControl): boolean {
+    return formControl.errors?.['minlength'];
+  }
+
+  invMaxLength(formControl: FormControl): boolean {
+    return formControl.errors?.['maxlength'];
+  }
+
+  get dbName(): FormControl {
+    return this.form.get('dbName') as FormControl;
+  }
+
+  get tokenLifeTime(): FormControl {
+    return this.form.get('tokenLifeTime') as FormControl;
   }
 }

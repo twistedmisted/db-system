@@ -1,0 +1,13 @@
+html,
+body {
+  overflow-x: hidden;
+  display: block;
+}
+
+:host {
+  html,
+  body {
+    overflow-x: hidden;
+    display: block;
+  }
+}

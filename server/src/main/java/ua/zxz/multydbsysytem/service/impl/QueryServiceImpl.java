@@ -29,8 +29,9 @@ public class QueryServiceImpl implements QueryService {
     @Override
     public Object getByColumn(long dbId, String tableName, GetByColumnRequest request) {
         TableEntity tableEntity = getTableEntity(dbId, tableName);
-        return jdbcTemplate.query("SELECT * FROM table_" + tableEntity.getId() + " WHERE " + request.getColumnName() + " = " + request.getValue() + ";",
-                rs -> rs.next() ? mapObject(rs) : null);
+        return jdbcTemplate.query("SELECT * FROM table_" + tableEntity.getId() + " WHERE " + request.getColumnName() + " = ?;",
+                rs -> rs.next() ? mapObject(rs) : null,
+                request.getValue());
     }
 
     private TableEntity getTableEntity(long dbId, String tableName) {

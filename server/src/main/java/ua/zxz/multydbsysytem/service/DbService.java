@@ -16,4 +16,6 @@ public interface DbService {
     void removeDbById(long id, String username);
 
     boolean userHasRightsToDb(long dbId, String username);
+
+    boolean dbAlreadyHasTableWithName(long dbId, String table);
 }

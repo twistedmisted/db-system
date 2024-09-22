@@ -24,10 +24,12 @@ public class RegistrationRequest {
     @Size(min = 2, max = 255, message = "The username length can be between 2 and 256 characters")
     private String username;
 
+    @NotBlank(message = "The email can't be empty")
     @NotNull(message = "The email can't be null")
     @Email(message = "It is not an email")
     private String email;
 
+    @NotNull(message = "The password can't be null. The minimum length of password is 8 characters")
     @Size(min = 8, message = "The minimum length of password is 8 characters")
     private String password;
 }

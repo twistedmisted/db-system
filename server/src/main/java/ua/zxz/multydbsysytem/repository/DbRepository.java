@@ -16,4 +16,6 @@ public interface DbRepository extends CrudRepository<DbEntity, Long> {
     boolean existsByNameAndUserUsername(final String name, final String username);
 
     boolean existsByIdAndUserUsername(final Long id, final String username);
+
+    boolean existsByIdAndTablesName(long dbId, String table);
 }

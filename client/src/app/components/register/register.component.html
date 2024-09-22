@@ -2,7 +2,7 @@
   <form [formGroup]="form" (submit)="submit()">
     <h1 class="h3 mb-3 fw-normal">Please register</h1>
 
-    <div class="form-floating">
+    <div class="form-floating mb-3">
       <input
         formControlName="firstName"
         class="form-control"
@@ -10,17 +10,34 @@
         placeholder="Max"
       />
       <label for="floatingName">Name</label>
+      <div class="text-danger" *ngIf="validate(firstName)">
+        <div *ngIf="isRequired(firstName)">
+          <p>First name is required.</p>
+        </div>
+        <div *ngIf="invMaxLength(firstName)">
+          First name length must be not longer than 50 characters.
+        </div>
+      </div>
     </div>
-    <div class="form-floating">
+    <div class="form-floating mb-3">
       <input
         formControlName="lastName"
         class="form-control"
         id="floatingLastName"
+        name="floatingLastName"
         placeholder="Smith"
       />
       <label for="floatingLastName">Surname</label>
+      <div class="text-danger" *ngIf="validate(lastName)">
+        <div *ngIf="isRequired(lastName)">
+          <p>Last name is required.</p>
+        </div>
+        <div *ngIf="invMaxLength(lastName)">
+          Last name length must be not longer than 50 characters.
+        </div>
+      </div>
     </div>
-    <div class="form-floating">
+    <div class="form-floating mb-3">
       <input
         formControlName="username"
         class="form-control"
@@ -28,8 +45,19 @@
         placeholder="username"
       />
       <label for="floatingUsername">Username</label>
+      <div class="text-danger" *ngIf="validate(username)">
+        <div *ngIf="isRequired(username)">
+          <p>Username is required.</p>
+        </div>
+        <div *ngIf="invMinLength(username)">
+          Username length must be at least 4 characters.
+        </div>
+        <div *ngIf="invMaxLength(username)">
+          Username length must be not longer than 50 characters.
+        </div>
+      </div>
     </div>
-    <div class="form-floating">
+    <div class="form-floating mb-3">
       <input
         formControlName="email"
         type="email"
@@ -38,8 +66,14 @@
         placeholder="name@example.com"
       />
       <label for="floatingEmail">Email address</label>
+      <div class="text-danger" *ngIf="validate(email)">
+        <div *ngIf="isRequired(email)">
+          <p>Email is required.</p>
+        </div>
+        <div *ngIf="email.errors?.['email']">Email is invalid</div>
+      </div>
     </div>
-    <div class="form-floating">
+    <div class="form-floating mb-3">
       <input
         formControlName="password"
         type="password"
@@ -48,8 +82,24 @@
         placeholder="Password"
       />
       <label for="floatingPassword">Password</label>
+      <div class="text-danger" *ngIf="validate(password)">
+        <div *ngIf="isRequired(password)">
+          <p>Password is required.</p>
+        </div>
+        <div *ngIf="invMinLength(password)">
+          Password length must be at least 8 characters.
+        </div>
+      </div>
     </div>
 
-    <button class="btn btn-primary w-100 py-2" type="submit">Submit</button>
+    <button
+      class="btn btn-primary w-100 py-2"
+      type="submit"
+      [disabled]="!form.valid"
+    >
+      Submit
+    </button>
   </form>
 </main>
+
+<div class="valid-feedback">Looks good!</div>

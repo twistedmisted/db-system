@@ -11,7 +11,7 @@ import {
 } from '@angular/forms';
 import { Router } from '@angular/router';
 import { FieldTypeService } from '../../service/fieldtype.service';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, catchError, EMPTY } from 'rxjs';
 import { ConstraintService } from '../../service/constraint.service';
 import { Constraint } from '../../models/constraint.model';
 import { HttpClient } from '@angular/common/http';
@@ -19,11 +19,18 @@ import { BASE_URL } from '../../constants';
 import { ConstraintsResponse } from '../../models/response/ConstraintsResponse';
 import { TableService } from '../../service/table.service';
 import { CreateTableRequest } from '../../models/request/CreateTableRequest';
+import { ErrorBlockComponent } from '../error-block/error-block.component';
+import { ErrorService } from '../../service/error.service';
 
 @Component({
   selector: 'app-create-table',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    ErrorBlockComponent,
+  ],
   templateUrl: './create-table.component.html',
   styleUrl: './create-table.component.scss',
 })
@@ -39,6 +46,7 @@ export class CreateTableComponent implements OnInit {
     private constraintService: ConstraintService,
     private router: Router,
     private formBuilder: FormBuilder,
+    private errorService: ErrorService,
     private http: HttpClient
   ) {}
 
@@ -47,16 +55,9 @@ export class CreateTableComponent implements OnInit {
 
     this.initConstraints();
     this.initFieldTypes();
-
-    console.log('test');
-    this.http
-      .get<ConstraintsResponse>(BASE_URL + '/constraints')
-      .subscribe((res) => console.log(res));
-    console.log('test');
   }
 
   private initFormGroup() {
-    console.log('here');
     this.form = this.formBuilder.group({
       dbId: [0, [Validators.required]],
       name: [
@@ -106,7 +107,7 @@ export class CreateTableComponent implements OnInit {
         ],
       ],
       columnType: this.formBuilder.group({
-        type: '',
+        type: ['', [Validators.required]],
         value: null,
       }),
       columnConstraints: this.formBuilder.array(
@@ -141,8 +142,48 @@ export class CreateTableComponent implements OnInit {
       columns: valueToSave.columns,
     };
 
-    this.tableService.save(createTableRequest).subscribe((res) => {
-      this.router.navigate(['dbs', this.dbId]);
-    });
+    this.tableService
+      .save(createTableRequest)
+      // .pipe(
+      //   catchError((err) => {
+      //     this.errorService.openError([err.error.error]);
+      //     return EMPTY;
+      //   })
+      // )
+      .subscribe((res) => {
+        this.router.navigate(['dbs', this.dbId]);
+      });
+  }
+
+  validate(formControl: FormControl): boolean {
+    return formControl.invalid && (formControl.dirty || formControl.touched);
+  }
+
+  isRequired(formContol: FormControl): boolean {
+    return formContol.errors?.['required'];
+  }
+
+  invMinLength(formControl: FormControl): boolean {
+    return formControl.errors?.['minlength'];
+  }
+
+  invMaxLength(formControl: FormControl): boolean {
+    return formControl.errors?.['maxlength'];
+  }
+
+  get tableName(): FormControl {
+    return this.form.get('name') as FormControl;
+  }
+
+  getColumn(index: number) {
+    return this.form.get('columns')?.get(`${index}`);
+  }
+
+  getColumnName(index: number): FormControl {
+    return this.getColumn(index)?.get('name') as FormControl;
+  }
+
+  getColumnType(index: number): FormControl {
+    return this.getColumn(index)?.get('columnType')?.get('type') as FormControl;
   }
 }

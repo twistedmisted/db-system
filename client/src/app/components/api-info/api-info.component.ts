@@ -19,11 +19,10 @@ export class ApiInfoComponent implements OnInit {
 
   ngOnInit(): void {
     const queiries = '/queries';
-    this.getByFieldLink =
-      BASE_URL + '/' + this.tableName + queiries + '/getByColumn';
-    this.getAllLink = BASE_URL + '/' + this.tableName + queiries + '/getAll';
-    this.createLink = BASE_URL + '/' + this.tableName + queiries + '/save';
-    this.updateLink = BASE_URL + '/' + this.tableName + queiries + '/update';
-    this.deleteLink = BASE_URL + '/' + this.tableName + queiries + '/delete';
+    this.getByFieldLink = BASE_URL + queiries + '/' + this.tableName + '/getByColumn';
+    this.getAllLink = BASE_URL + queiries + '/' + this.tableName + '/getAll';
+    this.createLink = BASE_URL + queiries + '/' + this.tableName + '/save';
+    this.updateLink = BASE_URL + queiries + '/' + this.tableName + '/update';
+    this.deleteLink = BASE_URL + queiries + '/' + this.tableName + '/delete';
   }
 }

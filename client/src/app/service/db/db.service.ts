@@ -50,6 +50,10 @@ export class DbService {
     return this.http.post(BASE_URL + '/dbs', db);
   }
 
+  updateName(dbId: string, dbNewName: any) {
+    return this.http.put(BASE_URL + `/dbs/${dbId}`, dbNewName);
+  }
+
   delete(dbId: number) {
     return this.http.delete<string>(BASE_URL + `/dbs/${dbId}`);
   }

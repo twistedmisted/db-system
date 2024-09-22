@@ -2,9 +2,10 @@ import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { NavComponent } from './components/nav/nav.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { HttpClientModule } from '@angular/common/http';
 import { LoginComponent } from './components/login/login.component';
 import { CommonModule } from '@angular/common';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { MessageComponent } from './components/message/message.component';
 
 @Component({
   selector: 'app-root',
@@ -16,6 +17,8 @@ import { CommonModule } from '@angular/common';
     ReactiveFormsModule,
     LoginComponent,
     CommonModule,
+    FontAwesomeModule,
+    MessageComponent,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',

@@ -19,6 +19,17 @@
             formControlName="dbName"
             required
           />
+          <div class="text-danger" *ngIf="validate(dbName)">
+            <div *ngIf="isRequired(dbName)">
+              <p>Database name is required.</p>
+            </div>
+            <div *ngIf="invMinLength(dbName)">
+              Database name length must be at least 2 characters.
+            </div>
+            <div *ngIf="invMaxLength(dbName)">
+              Database name length must be not longer than 255 characters.
+            </div>
+          </div>
         </div>
 
         <div class="mb-3">
@@ -39,9 +50,16 @@
               {{ lifeTime }}
             </option>
           </select>
+          <div class="text-danger" *ngIf="validate(tokenLifeTime)">
+            <div *ngIf="isRequired(tokenLifeTime)">
+              <p>Token life is required.</p>
+            </div>
+          </div>
         </div>
 
-        <button type="submit" class="btn btn-primary">Create Database</button>
+        <button type="submit" class="btn btn-primary" [disabled]="!form.valid">
+          Create Database
+        </button>
       </form>
     </div>
   </div>

@@ -46,10 +46,6 @@ export class EditColumnComponent implements OnInit {
 
     this.initFieldTypes();
 
-    // if (this.column && this.constraints) {
-    //   this.initForm();
-    // }
-
     forkJoin({
       column: this.initColumn(),
       constraints: this.initConstraints(),
@@ -104,12 +100,5 @@ export class EditColumnComponent implements OnInit {
     const valueToSave = Object.assign({}, this.form.value, {
       columnConstraints: constraintsToSave,
     });
-
-    console.log(valueToSave);
-
-    // this.columnService.updateColumn(this.tableId, valueToSave).subscribe((res) => {
-    //   console.log(res);
-    //   this._location.back();
-    // });
   }
 }

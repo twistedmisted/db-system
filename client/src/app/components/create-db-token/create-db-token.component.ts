@@ -3,6 +3,7 @@ import { DbtokenService } from '../../service/dbtoken.service';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import {
   FormBuilder,
+  FormControl,
   FormGroup,
   FormsModule,
   ReactiveFormsModule,
@@ -53,8 +54,19 @@ export class CreateDbTokenComponent implements OnInit {
 
   submit(): void {
     this.dbtokenService.create(this.form.getRawValue()).subscribe((res) => {
-      console.log(res);
       this.router.navigate(['dbs', this.dbId]);
     });
+  }
+
+  validate(formControl: FormControl): boolean {
+    return formControl.invalid && (formControl.dirty || formControl.touched);
+  }
+
+  isRequired(formContol: FormControl): boolean {
+    return formContol.errors?.['required'];
+  }
+
+  get lifeTime(): FormControl {
+    return this.form.get('lifeTime') as FormControl;
   }
 }

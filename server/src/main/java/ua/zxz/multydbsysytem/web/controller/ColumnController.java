@@ -36,7 +36,7 @@ public class ColumnController {
                                                @RequestBody TablePayload.Column column,
                                                Principal principal) {
         columnService.addNewColumn(tableId, column, principal.getName());
-        return new ResponseEntity<>(OK);
+        return new ResponseEntity<>(Map.of("message", "Column successfully added"), OK);
     }
 
     @PostMapping("/deleteColumn")
@@ -44,6 +44,6 @@ public class ColumnController {
                                                @RequestBody ColumnNamePayload columnNamePayload,
                                                Principal principal) {
         columnService.deleteColumn(tableId, columnNamePayload.getName(), principal.getName());
-        return new ResponseEntity<>(OK);
+        return new ResponseEntity<>(Map.of("message", "Column successfully removed"), OK);
     }
 }

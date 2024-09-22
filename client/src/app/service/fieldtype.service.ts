@@ -33,9 +33,6 @@ export class FieldTypeService {
   }
 
   getFieldTypes(): BehaviorSubject<string[]> {
-    this.http
-      .get<DbResponse>(BASE_URL + '/dbs/1')
-      .subscribe((res) => console.log(res));
     return this.fieldTypes$;
   }
 }

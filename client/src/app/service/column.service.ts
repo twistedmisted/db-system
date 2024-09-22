@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BASE_URL } from '../constants';
 import { ColumnResponse } from '../models/response/ColumnResponse';
+import { MessageResponse } from '../models/response/MessageResponse';
 
 @Injectable({
   providedIn: 'root',
@@ -16,13 +17,17 @@ export class ColumnService {
   }
 
   addColumn(tableId: string, column: any) {
-    return this.http.post(BASE_URL + `/columns/addColumn`, column, {
-      params: { tableId: tableId },
-    });
+    return this.http.post<MessageResponse>(
+      BASE_URL + `/columns/addColumn`,
+      column,
+      {
+        params: { tableId: tableId },
+      }
+    );
   }
 
   delete(tableId: number, columnName: string) {
-    return this.http.post(
+    return this.http.post<MessageResponse>(
       BASE_URL + `/columns/deleteColumn`,
       {
         name: columnName,

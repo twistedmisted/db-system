@@ -9,11 +9,15 @@ import {
   withInterceptors,
 } from '@angular/common/http';
 import { authInterceptor } from './Http-Interceptors/auth.interceptor';
+import { errorInterceptor } from './Http-Interceptors/error.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
     provideClientHydration(),
-    provideHttpClient(withFetch(), withInterceptors([authInterceptor])),
+    provideHttpClient(
+      withFetch(),
+      withInterceptors([authInterceptor, errorInterceptor])
+    ),
   ],
 };

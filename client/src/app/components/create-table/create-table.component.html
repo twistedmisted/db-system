@@ -1,8 +1,23 @@
 <form [formGroup]="form" class="col-lg-6 offset-lg-3" (ngSubmit)="submit()">
   <div class="jsutify-content-center">
     <div class="mb-3">
+      <button class="btn btn-secondary" onclick="history.back()">Back</button>
+    </div>
+    <app-error-block></app-error-block>
+    <div class="mb-3">
       <label for="exampleInputEmail1" class="form-label">Table Name</label>
       <input formControlName="name" class="form-control" id="tableName" />
+      <div class="text-danger" *ngIf="validate(tableName)">
+        <div *ngIf="isRequired(tableName)">
+          <p>Table name is required.</p>
+        </div>
+        <div *ngIf="invMinLength(tableName)">
+          Table name length must be at least 2 characters.
+        </div>
+        <div *ngIf="invMaxLength(tableName)">
+          Table name length must be not longer than 255 characters.
+        </div>
+      </div>
     </div>
     <hr />
     <h5 class="text-center">Fields</h5>
@@ -12,35 +27,53 @@
         [formGroupName]="i"
         class="m-3"
       >
-        <div class="d-flex gap-2 mb-1">
-          <div class="d-flex gap-2 w-50">
+        <div class="d-flex mb-1">
+          <div class="w-50">
             <input
               id="columnName-{{ i }}"
               formControlName="name"
               placeholder="Enter column name"
               class="form-control w-100"
             />
+            <div class="text-danger" *ngIf="validate(getColumnName(i))">
+              <div *ngIf="isRequired(getColumnName(i))">
+                <p>Column name is required.</p>
+              </div>
+              <div *ngIf="invMinLength(getColumnName(i))">
+                Column name length must be at least 2 characters.
+              </div>
+              <div *ngIf="invMaxLength(getColumnName(i))">
+                Column name length must be not longer than 255 characters.
+              </div>
+            </div>
           </div>
-          <div class="d-flex gap-2 w-50" formGroupName="columnType">
-            <select
-              class="form-select w-50"
-              formControlName="type"
-              [value]="['change']"
-            >
-              <option value="" disabled selected>Choose field type</option>
-              <option
-                *ngFor="let fieldType of fieldTypes$ | async"
-                [value]="fieldType"
+          <div class="d-block gap-2 w-50">
+            <div class="d-flex gap-2" formGroupName="columnType">
+              <select
+                class="form-select w-50"
+                formControlName="type"
+                [value]="['change']"
               >
-                {{ fieldType }}
-              </option>
-            </select>
-            <input
-              id="columnType-{{ i }}"
-              formControlName="value"
-              placeholder="Enter column type param"
-              class="form-control w-50"
-            />
+                <option value="" disabled selected>Choose field type</option>
+                <option
+                  *ngFor="let fieldType of fieldTypes$ | async"
+                  [value]="fieldType"
+                >
+                  {{ fieldType }}
+                </option>
+              </select>
+              <input
+                id="columnType-{{ i }}"
+                formControlName="value"
+                placeholder="Enter column type param"
+                class="form-control w-50"
+              />
+            </div>
+            <div class="text-danger" *ngIf="validate(getColumnType(i))">
+              <div *ngIf="isRequired(getColumnType(i))">
+                <p>Column type is required.</p>
+              </div>
+            </div>
           </div>
         </div>
         <div class="mb-1">
@@ -48,13 +81,13 @@
             class="btn btn-secondary w-100"
             type="button"
             data-bs-toggle="collapse"
-            data-bs-target="#collapseExample"
+            [attr.data-bs-target]="['#collapseExample' + i]"
             aria-expanded="false"
-            aria-controls="collapseExample"
+            [attr.aria-controls]="['collapseExample' + i]"
           >
             <i class="bi bi-arrow-down-circle"></i> Constraints
           </button>
-          <div class="collapse" id="collapseExample">
+          <div class="collapse" [id]="['collapseExample' + i]">
             <div
               formArrayName="columnConstraints"
               class="form-check"
@@ -92,7 +125,7 @@
     </div>
   </div>
   <div class="text-center">
-    <button class="btn btn-success" type="submit">
+    <button class="btn btn-success" type="submit" [disabled]="!form.valid">
       <i class="bi bi-check-circle"></i> Create Table
     </button>
   </div>

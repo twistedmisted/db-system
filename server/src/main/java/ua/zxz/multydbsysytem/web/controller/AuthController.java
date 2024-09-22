@@ -9,8 +9,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 import ua.zxz.multydbsysytem.dto.UserDto;
+import ua.zxz.multydbsysytem.exception.WrongDataException;
 import ua.zxz.multydbsysytem.service.UserService;
 import ua.zxz.multydbsysytem.service.security.JwtService;
 import ua.zxz.multydbsysytem.service.security.RestorePasswordService;
@@ -24,8 +24,7 @@ import java.util.Map;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.OK;
-import static org.springframework.http.HttpStatus.UNAUTHORIZED;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.*;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -39,7 +38,7 @@ public class AuthController {
     private final JwtService jwtService;
     private final RestorePasswordService restorePasswordService;
 
-    @PostMapping(value = "/register", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/register", produces = TEXT_PLAIN_VALUE)
     public ResponseEntity<Object> register(@Valid @RequestBody RegistrationRequest registrationRequest) {
         userService.saveUser(createFromRequest(registrationRequest));
         return new ResponseEntity<>("User successfully registered", OK);
@@ -62,7 +61,7 @@ public class AuthController {
             authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                     authenticationRequest.getUsername(), authenticationRequest.getPassword()));
         } catch (final BadCredentialsException ex) {
-            throw new ResponseStatusException(UNAUTHORIZED, "Неправильно введено пошту або пароль, первірте правильність вводу.");
+            throw new WrongDataException("Email or password is incorrect");
         }
         AuthenticationResponse authenticationResponse = new AuthenticationResponse();
         authenticationResponse.setAccessToken(jwtService.generateToken(authenticate));
@@ -86,8 +85,8 @@ public class AuthController {
     }
 
     @GetMapping("/validate-token")
-    public boolean validateToken(@RequestHeader(AUTHORIZATION) String authHeader) {
+    public ResponseEntity<Object> validateToken(@RequestHeader(AUTHORIZATION) String authHeader) {
         final String token = authHeader.substring(7);
-        return jwtService.validateToken(token);
+        return new ResponseEntity<>(Map.of("isValid", jwtService.validateToken(token)), OK);
     }
 }
