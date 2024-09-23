@@ -4,20 +4,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 import ua.zxz.multydbsysytem.entity.TableEntity;
 import ua.zxz.multydbsysytem.exception.WrongDataException;
 import ua.zxz.multydbsysytem.repository.TableRepository;
 import ua.zxz.multydbsysytem.service.QueryService;
-import ua.zxz.multydbsysytem.web.payload.GetByColumnRequest;
 import ua.zxz.multydbsysytem.web.payload.query.Condition;
 import ua.zxz.multydbsysytem.web.payload.query.UpdateQueryRequest;
 
 import java.sql.*;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 @Slf4j
 @Service
@@ -28,10 +24,17 @@ public class QueryServiceImpl implements QueryService {
     private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public Object getByColumn(long dbId, String tableName, GetByColumnRequest request) {
+    public List<Object> getByColumn(long dbId, String tableName, Condition request) {
         TableEntity tableEntity = getTableEntity(dbId, tableName);
-        return jdbcTemplate.query("SELECT * FROM table_" + tableEntity.getId() + " WHERE " + request.getColumnName() + " = ?;",
-                rs -> rs.next() ? mapObject(rs) : null,
+        return jdbcTemplate.query("SELECT * FROM table_" + tableEntity.getId() +
+                        " WHERE " + request.getColumnName() + request.getOperator().toString() + "?;",
+                rs -> {
+                    List<Object> list = new ArrayList<>();
+                    while (rs.next()) {
+                        list.add(mapObject(rs));
+                    }
+                    return list;
+                },
                 request.getValue());
     }
 

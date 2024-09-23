@@ -2,9 +2,9 @@ package ua.zxz.multydbsysytem.web.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ua.zxz.multydbsysytem.service.QueryService;
-import ua.zxz.multydbsysytem.web.payload.GetByColumnRequest;
 import ua.zxz.multydbsysytem.web.payload.query.Condition;
 import ua.zxz.multydbsysytem.web.payload.query.UpdateQueryRequest;
 
@@ -14,6 +14,7 @@ import java.util.Map;
 
 import static org.springframework.http.HttpStatus.OK;
 
+@Validated
 @RestController
 @RequestMapping("/queries")
 @RequiredArgsConstructor
@@ -22,11 +23,11 @@ public class QueryController {
     private final QueryService queryService;
 
     @GetMapping("/{tableName}/getByColumn")
-    public ResponseEntity<Object> getById(@PathVariable("tableName") String tableName,
-                                          @RequestBody GetByColumnRequest request,
-                                          Principal principal) {
+    public ResponseEntity<Object> getByColumn(@PathVariable("tableName") String tableName,
+                                              @RequestBody Condition request,
+                                              Principal principal) {
         Map<String, Object> body = new HashMap<>();
-        body.put("object", queryService.getByColumn(Long.parseLong(principal.getName()), tableName, request));
+        body.put("objects", queryService.getByColumn(Long.parseLong(principal.getName()), tableName, request));
         return new ResponseEntity<>(body, OK);
     }
 

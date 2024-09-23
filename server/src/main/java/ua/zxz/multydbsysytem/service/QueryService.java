@@ -1,6 +1,5 @@
 package ua.zxz.multydbsysytem.service;
 
-import ua.zxz.multydbsysytem.web.payload.GetByColumnRequest;
 import ua.zxz.multydbsysytem.web.payload.query.Condition;
 import ua.zxz.multydbsysytem.web.payload.query.UpdateQueryRequest;
 
@@ -9,7 +8,7 @@ import java.util.Map;
 
 public interface QueryService {
 
-    Object getByColumn(long dbId, String tableName, GetByColumnRequest request);
+    List<Object> getByColumn(long dbId, String tableName, Condition request);
 
     List<Object> getAll(long dbId, String tableName);
 

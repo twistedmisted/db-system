@@ -9,7 +9,7 @@
         aria-expanded="true"
         aria-controls="collapseGetByField"
       >
-        Get by Field
+        Get by Column
       </button>
     </h2>
     <div
@@ -27,8 +27,9 @@
         <pre>
 <code>
 &#123;
-    "columnName": &#123;column name&#125;,
-    "value": &#123;value&#125;
+    "columnName": &#123;columnName&#125;,
+    "value": &#123;value&#125;,
+    "operator": &#123;One of: EQUALS, NOT_EQUALS, GREATER, LOWER &#125;
 &#125;
 </code>
         </pre>
@@ -139,7 +140,7 @@ N/A (No request body required)
     "condition": &#123;
         "columnName": &#123;columnName&#125;,
         "value": &#123;value&#125;,
-        "operator": &#123;One of: EQUALS, NOT EQUALS, GREATER, LOWER &#125;
+        "operator": &#123;One of: EQUALS, NOT_EQUALS, GREATER, LOWER &#125;
     &#125;,
     "object": &#123;
         "columnName1": &#123;value1&#125;,
