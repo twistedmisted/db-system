@@ -21,15 +21,15 @@ public class FieldSettings {
     @Getter
     @RequiredArgsConstructor
     public enum Setting {
-        NULLABLE("NOT NULL", "NO"),
-        AUTO_INCREMENT("AUTO_INCREMENT", "YES"),
         PRIMARY_KEY("PRIMARY KEY", "YES"),
+        IDENTITY("IDENTITY", "YES"),
+        AUTO_INCREMENT("AUTO_INCREMENT", "YES"),
+        NULLABLE("NOT NULL", "NO"),
         UNIQUE("UNIQUE", "YES"),
-        FOREIGN_KEY("FOREIGN KEY", "YES"),
-        IDENTITY("IDENTITY", "YES");
+        FOREIGN_KEY("FOREIGN KEY", "YES");
 
         private final String value;
-//        private final boolean isActiveWhen;
+        //        private final boolean isActiveWhen;
         private final String isActiveWhen;
 
         @JsonValue
