@@ -1,15 +1,12 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MessageService } from '../../service/message.service';
-import {} from '@fortawesome/free-solid-svg-icons';
 import { Subject, takeUntil } from 'rxjs';
 import { CommonModule } from '@angular/common';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { console } from 'inspector';
 
 @Component({
   selector: 'app-message',
   standalone: true,
-  imports: [CommonModule, FontAwesomeModule],
+  imports: [CommonModule],
   templateUrl: './message.component.html',
   styleUrl: './message.component.scss',
 })

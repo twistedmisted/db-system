@@ -38,10 +38,10 @@ public class AuthController {
     private final JwtService jwtService;
     private final RestorePasswordService restorePasswordService;
 
-    @PostMapping(value = "/register", produces = TEXT_PLAIN_VALUE)
+    @PostMapping(value = "/register")
     public ResponseEntity<Object> register(@Valid @RequestBody RegistrationRequest registrationRequest) {
         userService.saveUser(createFromRequest(registrationRequest));
-        return new ResponseEntity<>("User successfully registered", OK);
+        return new ResponseEntity<>(Map.of("message", "User successfully registered"), OK);
     }
 
     private UserDto createFromRequest(RegistrationRequest registrationRequest) {

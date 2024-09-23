@@ -29,7 +29,14 @@ services:
   server:
     container_name: multi-db-system
     build:
-      context: .
+      context: server
       dockerfile: Dockerfile
     ports:
       - '8080:8080'
+  client:
+    container_name: client-db-system
+    build:
+      context: client
+      dockerfile: Dockerfile
+    ports:
+      - '4200:4200'

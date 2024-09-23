@@ -9,9 +9,9 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router } from '@angular/router';
-import {MessageService} from "../../service/message.service";
-import {AuthService} from "../../service/auth.service";
-import {catchError, EMPTY} from "rxjs";
+import { MessageService } from '../../service/message.service';
+import { AuthService } from '../../service/auth.service';
+import { catchError, EMPTY } from 'rxjs';
 
 @Component({
   selector: 'app-register',
@@ -68,14 +68,10 @@ export class RegisterComponent implements OnInit {
   }
 
   submit(): void {
-    this.authService.register(this.form.getRawValue())
-      .pipe(catchError(err => {
-        console.log(err)
-        return EMPTY;
-      }))
-      .subscribe((res) => {
-        this.messageService.openSuccess(res.message);
-        this.router.navigate(['/login']).then((r) => window.location.reload());
+    this.authService.register(this.form.getRawValue()).subscribe((res) => {
+      console.log(res.message);
+      this.messageService.openSuccess(res.message);
+      this.router.navigate(['/login']);
     });
   }
 
