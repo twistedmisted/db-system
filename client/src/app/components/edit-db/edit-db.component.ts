@@ -8,7 +8,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { DbService } from '../../service/db/db.service';
+import { DbService } from '../../service/db.service';
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({

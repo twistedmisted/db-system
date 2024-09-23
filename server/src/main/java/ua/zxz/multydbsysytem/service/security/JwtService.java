@@ -84,7 +84,7 @@ public class JwtService {
 
     public void invalidateTokenByUserToken(String token) {
         JwtHash jwtTokenHash = jwtRepository.findByToken(token)
-                .orElseThrow(() -> new ResponseStatusException(INTERNAL_SERVER_ERROR, "Не вдалося розлогінити користувача."));
+                .orElseThrow(() -> new ResponseStatusException(INTERNAL_SERVER_ERROR, "Can't logout."));
         jwtRepository.delete(jwtTokenHash);
     }
 }

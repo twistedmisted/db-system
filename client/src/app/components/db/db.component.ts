@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { DbService } from '../../service/db/db.service';
+import { DbService } from '../../service/db.service';
 import { Db } from '../../models/db.model';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { TableListComponent } from '../table-list/table-list.component';

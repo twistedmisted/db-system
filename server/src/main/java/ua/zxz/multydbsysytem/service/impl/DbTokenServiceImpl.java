@@ -12,6 +12,7 @@ import ua.zxz.multydbsysytem.dto.DbStatus;
 import ua.zxz.multydbsysytem.dto.DbTokenDto;
 import ua.zxz.multydbsysytem.dto.DbTokenLifeTime;
 import ua.zxz.multydbsysytem.entity.DbTokenEntity;
+import ua.zxz.multydbsysytem.exception.WrongDataException;
 import ua.zxz.multydbsysytem.mapper.impl.DbMapper;
 import ua.zxz.multydbsysytem.mapper.impl.DbTokenMapper;
 import ua.zxz.multydbsysytem.repository.DbRepository;
@@ -75,7 +76,7 @@ public class DbTokenServiceImpl implements DbTokenService {
     @Override
     public void create(Long dbId, DbTokenLifeTime lifeTime, Supplier<Boolean> userHasRights) {
         if (!userHasRights.get()) {
-            throw new ResponseStatusException(BAD_REQUEST, "Can't update db token, something went wrong");
+            throw new WrongDataException("Can't update db token, something went wrong");
         }
         DbTokenEntity dbTokenEntity = dbTokenRepository.findById(dbId).orElseGet(() -> {
             DbTokenEntity t = new DbTokenEntity();
@@ -120,10 +121,10 @@ public class DbTokenServiceImpl implements DbTokenService {
     @Override
     public DbTokenDto getById(Long dbId, String username) {
         if (!dbRepository.existsByIdAndUserUsername(dbId, username)) {
-            throw new ResponseStatusException(BAD_REQUEST, "Can't get db token, something went wrong");
+            throw new WrongDataException("Can't get db token, something went wrong");
         }
         return dbTokenMapper.entityToDto(dbTokenRepository.findById(dbId)
                 .orElseThrow(() ->
-                        new ResponseStatusException(BAD_REQUEST, "Can't get db token, something went wrong")));
+                        new WrongDataException("Can't get db token, something went wrong")));
     }
 }

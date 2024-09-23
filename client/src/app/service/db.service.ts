@@ -1,10 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { Db } from '../../models/db.model';
-import { DbsResponse } from '../../models/response/DbsResponse';
-import { BASE_URL } from '../../constants';
-import { DbResponse } from '../../models/response/DbResponse';
+import { Db } from '../models/db.model';
+import { DbsResponse } from '../models/response/DbsResponse';
+import { BASE_URL } from '../constants';
+import { DbResponse } from '../models/response/DbResponse';
 import { text } from 'stream/consumers';
 
 @Injectable({

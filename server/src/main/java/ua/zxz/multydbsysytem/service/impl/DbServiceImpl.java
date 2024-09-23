@@ -11,6 +11,7 @@ import ua.zxz.multydbsysytem.dto.DbDto;
 import ua.zxz.multydbsysytem.dto.PageDto;
 import ua.zxz.multydbsysytem.entity.DbEntity;
 import ua.zxz.multydbsysytem.entity.TableEntity;
+import ua.zxz.multydbsysytem.exception.WrongDataException;
 import ua.zxz.multydbsysytem.mapper.impl.DbMapper;
 import ua.zxz.multydbsysytem.repository.DbRepository;
 import ua.zxz.multydbsysytem.service.DbService;
@@ -34,14 +35,14 @@ public class DbServiceImpl implements DbService {
     @Override
     public DbDto getById(long id) {
         return dbMapper.entityToDto(dbRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Can't find a db by id = [" + id + "]")));
+                .orElseThrow(() -> new WrongDataException("Can't find a db by id = [" + id + "]")));
     }
 
     @Override
     public PageDto<DbDto> getAll(int pageNum, int pageSize, String username) {
         if (pageNum < 0 && pageSize < 0) {
             log.error("pageNum and pageSize can't be negative");
-            throw new ResponseStatusException(BAD_REQUEST, "pageNum and pageSize can't be negative");
+            throw new WrongDataException("pageNum and pageSize can't be negative");
         }
         Page<DbEntity> dbEntityPage = dbRepository.findAllByUserUsername(username, PageRequest.of(pageNum, pageSize));
         if (dbEntityPage.isEmpty()) {
@@ -59,7 +60,7 @@ public class DbServiceImpl implements DbService {
     public void saveDb(DbDto dbDto) {
         if (existsByNameAndUsername(dbDto.getName(), dbDto.getUser().getUsername())) {
             log.warn("The user = [{}] already has db with name = [{}]", dbDto.getName(), dbDto.getUser().getUsername());
-            throw new ResponseStatusException(BAD_REQUEST, "The user already has db with name = [" + dbDto.getName() + "]");
+            throw new WrongDataException("The user already has db with name = [" + dbDto.getName() + "]");
         }
         DbEntity savedDbEntity = dbRepository.save(dbMapper.dtoToEntity(dbDto));
         CompletableFuture.runAsync(() ->
@@ -74,7 +75,7 @@ public class DbServiceImpl implements DbService {
     public void updateDb(DbDto dbDto) {
         if (!existsByNameAndUsername(dbDto.getName(), dbDto.getUser().getUsername())) {
             log.warn("The user = [{}] does not have db with name = [{}]", dbDto.getName(), dbDto.getUser().getUsername());
-            throw new ResponseStatusException(BAD_REQUEST, "The user does not have db with name = [" + dbDto.getName() + "]");
+            throw new WrongDataException("The user does not have db with name = [" + dbDto.getName() + "]");
         }
         DbEntity dbEntity = dbRepository.findById(dbDto.getId()).get();
         dbEntity.setName(dbDto.getName());
@@ -84,7 +85,7 @@ public class DbServiceImpl implements DbService {
     @Override
     public void removeDbById(long id, String username) {
         if (!userHasRightsToDb(id, username)) {
-            throw new ResponseStatusException(BAD_REQUEST, "Can't remove db");
+            throw new WrongDataException("Can't remove db");
         }
         DbEntity dbEntity = dbRepository.findById(id).get();
         for (TableEntity table : dbEntity.getTables()) {

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { DbService } from '../../service/db/db.service';
+import { DbService } from '../../service/db.service';
 import { BehaviorSubject } from 'rxjs';
 import { Db } from '../../models/db.model';
 import { CommonModule } from '@angular/common';

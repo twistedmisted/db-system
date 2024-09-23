@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import ua.zxz.multydbsysytem.dto.PasswordMessageInfo;
 import ua.zxz.multydbsysytem.entity.UserEntity;
+import ua.zxz.multydbsysytem.exception.WrongDataException;
 import ua.zxz.multydbsysytem.repository.UserRepository;
 import ua.zxz.multydbsysytem.service.mail.MailService;
 
@@ -33,8 +34,7 @@ public class RestorePasswordService {
         log.debug("Restoring password for user with username = [{}]", username);
         if (!existsByEmail(username)) {
             log.debug("The user with username = [{}] does not exist", username);
-            throw new ResponseStatusException(NOT_FOUND, "Користувача з даною поштою не знайдено. " +
-                    "Переконайтеся в правильності вводу.");
+            throw new WrongDataException("This email is not registered.");
         }
         log.debug("Generating and saving new password");
         UserEntity userEntity = userRepository.findByUsername(username).get();

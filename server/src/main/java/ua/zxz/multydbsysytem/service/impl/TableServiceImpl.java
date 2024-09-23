@@ -46,7 +46,7 @@ public class TableServiceImpl implements TableService {
     public TableDto getTableById(Long id, String username) {
         TableEntity tableEntity = getTableById(id);
         if (!dbService.userHasRightsToDb(tableEntity.getDb().getId(), username)) {
-            throw new ResponseStatusException(BAD_REQUEST, "Can't get the table");
+            throw new WrongDataException("Can't get the table");
         }
         List<FieldDto> fields = jdbcTemplate.query(
                 GET_TABLE_INFORMATION_QUERY,
@@ -67,13 +67,13 @@ public class TableServiceImpl implements TableService {
 
     private TableEntity getTableById(Long id) {
         return tableRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(BAD_REQUEST, "Can't get the table"));
+                .orElseThrow(() -> new WrongDataException("Can't get the table"));
     }
 
     @Override
     public List<TableResponse> getAllTablesByDb(Long dbId, String username) {
         if (!dbService.userHasRightsToDb(dbId, username)) {
-            throw new ResponseStatusException(BAD_REQUEST, "Can't get tables, something went wrong");
+            throw new WrongDataException("Can't get tables, something went wrong");
         }
         return tableMapper.entitiesToResponse(tableRepository.findAllByDbId(dbId));
     }
@@ -112,7 +112,7 @@ public class TableServiceImpl implements TableService {
     public void update(TableDto tableDto, String username) {
         TableEntity tableEntity = getTableById(tableDto.getId());
         if (!dbService.userHasRightsToDb(tableEntity.getDb().getId(), username)) {
-            throw new ResponseStatusException(BAD_REQUEST, "Can't update table, something went wrong");
+            throw new WrongDataException("Can't update table, something went wrong");
         }
         tableEntity.setName(tableDto.getName());
         tableRepository.save(tableEntity);
@@ -122,7 +122,7 @@ public class TableServiceImpl implements TableService {
     public void deleteById(Long tableId, String username) {
         TableEntity tableEntity = getTableById(tableId);
         if (!dbService.userHasRightsToDb(tableEntity.getDb().getId(), username)) {
-            throw new ResponseStatusException(BAD_REQUEST, "Can't update table, something went wrong");
+            throw new WrongDataException("Can't update table, something went wrong");
         }
         tableRepository.deleteById(tableId);
         jdbcTemplate.update("DROP TABLE table_" + tableEntity.getId() + ";");
