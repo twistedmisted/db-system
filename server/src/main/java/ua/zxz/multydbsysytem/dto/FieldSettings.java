@@ -25,7 +25,7 @@ public class FieldSettings {
         AUTO_INCREMENT("AUTO_INCREMENT", "YES"),
         PRIMARY_KEY("PRIMARY KEY", "YES"),
         UNIQUE("UNIQUE", "YES"),
-        FOREIGN_KEY("FOREIGN KEY", "YES"),
+//        FOREIGN_KEY("FOREIGN KEY", "YES"),
         IDENTITY("IDENTITY", "YES");
 
         private final String value;
