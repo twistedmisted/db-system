@@ -1,4 +1,3 @@
-import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import {
   FormBuilder,
@@ -11,6 +10,7 @@ import {
 import { Router } from '@angular/router';
 import { Emitters } from '../../emitters/emitters';
 import { CommonModule } from '@angular/common';
+import {AuthService} from "../../service/auth.service";
 
 @Component({
   selector: 'app-login',
@@ -24,7 +24,7 @@ export class LoginComponent {
 
   constructor(
     private formBuilder: FormBuilder,
-    private http: HttpClient,
+    private authService: AuthService,
     private router: Router
   ) {
     this.form = this.formBuilder.group({
@@ -41,8 +41,7 @@ export class LoginComponent {
   }
 
   submit(): void {
-    this.http
-      .post('http://localhost:8080/auth/login', this.form.getRawValue())
+    this.authService.login(this.form.getRawValue())
       .subscribe((res) => {
         const token = (res as any).accessToken;
         localStorage.setItem('token', 'Bearer ' + token);

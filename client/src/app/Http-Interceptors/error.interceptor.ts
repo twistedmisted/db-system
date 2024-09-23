@@ -17,6 +17,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         errorService.openError([error.error.error]);
         // return throwError(() => error);
       } else {
+        console.log('error interceptor', error.error);
         if (error.status === 0) {
           messageService.openError(['Status code 0']);
         } else {

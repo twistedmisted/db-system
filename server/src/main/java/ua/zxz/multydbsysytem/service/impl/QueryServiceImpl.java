@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import ua.zxz.multydbsysytem.entity.TableEntity;
+import ua.zxz.multydbsysytem.exception.WrongDataException;
 import ua.zxz.multydbsysytem.repository.TableRepository;
 import ua.zxz.multydbsysytem.service.QueryService;
 import ua.zxz.multydbsysytem.web.payload.GetByColumnRequest;
@@ -36,7 +37,7 @@ public class QueryServiceImpl implements QueryService {
 
     private TableEntity getTableEntity(long dbId, String tableName) {
         return tableRepository.findByNameAndDbId(tableName, dbId)
-                .orElseThrow(() -> new ResponseStatusException(BAD_REQUEST, "Can't get data from table, something went wrong"));
+                .orElseThrow(() -> new WrongDataException("Can't get data from table, something went wrong"));
     }
 
     private Map<String, Object> mapObject(ResultSet rs) throws SQLException {

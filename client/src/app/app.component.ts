@@ -4,7 +4,6 @@ import { NavComponent } from './components/nav/nav.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { LoginComponent } from './components/login/login.component';
 import { CommonModule } from '@angular/common';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { MessageComponent } from './components/message/message.component';
 
 @Component({
@@ -17,7 +16,6 @@ import { MessageComponent } from './components/message/message.component';
     ReactiveFormsModule,
     LoginComponent,
     CommonModule,
-    FontAwesomeModule,
     MessageComponent,
   ],
   templateUrl: './app.component.html',

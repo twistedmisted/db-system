@@ -1,5 +1,4 @@
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import {
   FormBuilder,
@@ -10,6 +9,9 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router } from '@angular/router';
+import { MessageService } from '../../service/message.service';
+import { AuthService } from '../../service/auth.service';
+import { catchError, EMPTY } from 'rxjs';
 
 @Component({
   selector: 'app-register',
@@ -22,9 +24,10 @@ export class RegisterComponent implements OnInit {
   form!: FormGroup;
 
   constructor(
-    private http: HttpClient,
+    private authService: AuthService,
     private formBuilder: FormBuilder,
-    private router: Router
+    private router: Router,
+    private messageService: MessageService
   ) {}
 
   ngOnInit(): void {
@@ -65,11 +68,11 @@ export class RegisterComponent implements OnInit {
   }
 
   submit(): void {
-    this.http
-      .post('http://localhost:8080/auth/register', this.form.getRawValue())
-      .subscribe((res) => {
-        this.router.navigate(['/login']).then((r) => window.location.reload());
-      });
+    this.authService.register(this.form.getRawValue()).subscribe((res) => {
+      console.log(res.message);
+      this.messageService.openSuccess(res.message);
+      this.router.navigate(['/login']);
+    });
   }
 
   validate(formControl: FormControl): boolean {

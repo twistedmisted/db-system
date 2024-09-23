@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import ua.zxz.multydbsysytem.dto.FieldDto;
 import ua.zxz.multydbsysytem.entity.TableEntity;
+import ua.zxz.multydbsysytem.exception.WrongDataException;
 import ua.zxz.multydbsysytem.repository.TableRepository;
 import ua.zxz.multydbsysytem.service.ColumnService;
 import ua.zxz.multydbsysytem.util.DbColumnToDtoTransformer;
@@ -28,7 +29,7 @@ public class ColumnServiceImpl implements ColumnService {
     @Override
     public void addNewColumn(Long tableId, TablePayload.Column column, String username) {
         if (tableRepository.userHasAccessToTable(tableId, username) != 1) {
-            throw new ResponseStatusException(BAD_REQUEST, "Can't add new column, something went wrong");
+            throw new WrongDataException("Can't add new column, something went wrong");
         }
         jdbcTemplate.update("ALTER TABLE table_" + tableId + " ADD COLUMN " + ColumnService.mapToSqlColumn(column));
     }
@@ -36,7 +37,7 @@ public class ColumnServiceImpl implements ColumnService {
     @Override
     public void deleteColumn(Long tableId, String columnName, String username) {
         if (tableRepository.userHasAccessToTable(tableId, username) != 1) {
-            throw new ResponseStatusException(BAD_REQUEST, "Can't add new column, something went wrong");
+            throw new WrongDataException("Can't add new column, something went wrong");
         }
         jdbcTemplate.update("ALTER TABLE table_" + tableId + " DROP COLUMN " + columnName + " CASCADE;");
     }
@@ -45,7 +46,7 @@ public class ColumnServiceImpl implements ColumnService {
     public FieldDto getColumnByName(Long tableId, String columnName, String username) {
         TableEntity tableEntity = getTableById(tableId);
         if (!tableEntity.getDb().getUser().getUsername().equals(username)) {
-            throw new ResponseStatusException(BAD_REQUEST, "Can't get the table");
+            throw new WrongDataException("Can't get the table");
         }
         return jdbcTemplate.query(
                 GET_COLUMN_INFORMATION_QUERY,
@@ -56,6 +57,6 @@ public class ColumnServiceImpl implements ColumnService {
 
     private TableEntity getTableById(Long id) {
         return tableRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(BAD_REQUEST, "Can't get the table"));
+                .orElseThrow(() -> new WrongDataException("Can't get the table"));
     }
 }
