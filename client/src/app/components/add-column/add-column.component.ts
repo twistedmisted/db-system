@@ -15,6 +15,8 @@ import { Constraint } from '../../models/constraint.model';
 import { ColumnService } from '../../service/column.service';
 import { MessageService } from '../../service/message.service';
 import { ErrorBlockComponent } from '../error-block/error-block.component';
+import {Table} from "../../models/table.model";
+import {TableService} from "../../service/table.service";
 
 @Component({
   selector: 'app-add-column',
@@ -32,9 +34,12 @@ export class AddColumnComponent implements OnInit {
   form!: FormGroup;
   fieldTypes$ = new BehaviorSubject<string[]>([]);
   constraints!: Constraint[];
-  tableId!: string;
+  private tableId!: string;
+  private dbId!: string;
+  dbTables!: Table[];
 
   constructor(
+    private tableService: TableService,
     private constraintService: ConstraintService,
     private fieldTypeService: FieldTypeService,
     private columnService: ColumnService,
@@ -46,9 +51,12 @@ export class AddColumnComponent implements OnInit {
 
   ngOnInit(): void {
     this.tableId = this.activatedRoute.snapshot.paramMap.get('tableId')!;
+    this.dbId = this.activatedRoute.snapshot.paramMap.get('dbId')!;
 
     this.initFieldTypes();
     this.initConstraints();
+
+    this.initTablesByDbId();
   }
 
   private initForm(): void {
@@ -68,6 +76,10 @@ export class AddColumnComponent implements OnInit {
       columnConstraints: this.formBuilder.array(
         Object.keys(this.constraints).map((key) => false)
       ),
+      foreignTable: this.formBuilder.group({
+        tableName: '',
+        columnName: '',
+      }),
     });
   }
 
@@ -82,13 +94,45 @@ export class AddColumnComponent implements OnInit {
     });
   }
 
+  private initTablesByDbId() {
+    this.tableService.getTablesByDbId(this.dbId).subscribe((res) => {
+      this.dbTables = res.result.filter((t) => t.id !== Number(this.tableId));
+    });
+  }
+
+  getTableColumnsName(): string[] {
+    const curTableName = this.form.value.foreignTable.tableName;
+    return this.dbTables
+      .filter((t) => {
+        return t.name === curTableName;
+      })
+      .flatMap((t) => t.columns!.map((c) => c.name));
+  }
+
   submit(): void {
     const constraintsToSave = this.form.value.columnConstraints
       .map((v: any, i: number) => v && this.constraints[i])
       .filter((v: any) => !!v);
 
+    let ft;
+    if (constraintsToSave.find((e: Constraint) => e.value === 'FOREIGN KEY')) {
+      if (this.form.value.foreignTable.tableName === '') {
+        this.messageService.openError(['Need to specify a foreign table name for column ' + this.form.value.name])
+        throw new Error('Need to specify a table name ' + this.form.value.name);
+      }
+      if (this.form.value.foreignTable.columnName === '') {
+        this.messageService.openError(['Need to specify a foreign column name for column ' + this.form.value.name])
+        throw new Error('Need to specify a foreign column name for column ' + this.form.value.name);
+      }
+      const tableId = this.dbTables.find((t) => {
+        return t.name === this.form.value.foreignTable['tableName'];
+      })!.id;
+      ft = Object.assign({}, this.form.value.foreignTable, {tableName: `table_${tableId}`});
+    }
+
     const valueToSave = Object.assign({}, this.form.value, {
       columnConstraints: constraintsToSave,
+      foreignTable: ft,
     });
 
     this.columnService.addColumn(this.tableId, valueToSave).subscribe((res) => {

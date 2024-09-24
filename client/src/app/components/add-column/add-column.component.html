@@ -26,6 +26,7 @@
           <div class="mb-3">
             <label for="columnType" class="form-label">Column Type</label>
             <select
+              id="columnType"
               class="form-select"
               formControlName="type"
               [value]="['change']"
@@ -42,7 +43,7 @@
 
           <div class="mb-3">
             <label id="valueLabel" for="valueField" class="form-label"
-              >Type Value</label
+            >Type Value</label
             >
             <input
               type="text"
@@ -56,21 +57,49 @@
 
         <fieldset class="mb-3">
           <legend class="col-form-label pt-0">Constraints</legend>
-          <div *ngIf="constraints" formGroupName="columnConstraints">
+          <div *ngIf="constraints">
             <div
               class="form-check"
               *ngFor="let constraint of constraints; let i = index"
             >
-              <input
-                class="form-check-input"
-                type="checkbox"
-                id="notNull"
-                value="notNull"
-                [formControlName]="i"
-              />
-              <span class="form-check-label">
+              <div formGroupName="columnConstraints">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="notNull"
+                  value="notNull"
+                  [formControlName]="i"
+                />
+                <span class="form-check-label">
                 {{ constraint.value }}
               </span>
+              </div>
+              <div *ngIf="constraint.value === 'FOREIGN KEY'" class="d-flex" formGroupName="foreignTable">
+                <select
+                  class="form-select"
+                  [value]="['change']"
+                  formControlName="tableName"
+                >
+                  <option value="" disabled selected>Choose table</option>
+                  <option *ngFor="let table of dbTables" [value]="table.name">
+                    {{ table.name }}
+                  </option>
+                </select>
+                <select
+                  *ngIf="dbTables"
+                  class="form-select ms-3"
+                  [value]="['change']"
+                  formControlName="columnName"
+                >
+                  <option value="" disabled selected>Choose column</option>
+                  <option
+                    *ngFor="let column of getTableColumnsName()"
+                    [value]="column"
+                  >
+                    {{ column }}
+                  </option>
+                </select>
+              </div>
             </div>
           </div>
         </fieldset>
