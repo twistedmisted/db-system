@@ -14,13 +14,10 @@ import { FieldTypeService } from '../../service/fieldtype.service';
 import { BehaviorSubject, catchError, EMPTY } from 'rxjs';
 import { ConstraintService } from '../../service/constraint.service';
 import { Constraint } from '../../models/constraint.model';
-import { HttpClient } from '@angular/common/http';
-import { BASE_URL } from '../../constants';
-import { ConstraintsResponse } from '../../models/response/ConstraintsResponse';
 import { TableService } from '../../service/table.service';
 import { CreateTableRequest } from '../../models/request/CreateTableRequest';
 import { ErrorBlockComponent } from '../error-block/error-block.component';
-import { ErrorService } from '../../service/error.service';
+import { Table } from '../../models/table.model';
 
 @Component({
   selector: 'app-create-table',
@@ -38,6 +35,10 @@ export class CreateTableComponent implements OnInit {
   form!: FormGroup;
   fieldTypes$ = new BehaviorSubject<string[]>([]);
   constraints!: Constraint[];
+  dbTables!: Table[];
+  tableColumnsNames!: string[];
+  tableSelected: any;
+
   private dbId = history.state.dbId;
 
   constructor(
@@ -45,9 +46,7 @@ export class CreateTableComponent implements OnInit {
     private fieldTypeService: FieldTypeService,
     private constraintService: ConstraintService,
     private router: Router,
-    private formBuilder: FormBuilder,
-    private errorService: ErrorService,
-    private http: HttpClient
+    private formBuilder: FormBuilder
   ) {}
 
   ngOnInit(): void {
@@ -55,6 +54,8 @@ export class CreateTableComponent implements OnInit {
 
     this.initConstraints();
     this.initFieldTypes();
+
+    this.initTablesByDbId();
   }
 
   private initFormGroup() {
@@ -83,6 +84,12 @@ export class CreateTableComponent implements OnInit {
     });
   }
 
+  private initTablesByDbId() {
+    this.tableService.getTablesByDbId(this.dbId).subscribe((res) => {
+      this.dbTables = res.result;
+    });
+  }
+
   appendNewItem(item: Constraint): void {
     this.columns.push(
       new FormGroup({
@@ -94,6 +101,21 @@ export class CreateTableComponent implements OnInit {
 
   get columns(): FormArray {
     return this.form.get('columns') as FormArray;
+  }
+
+  updateColumnsList(index: number) {}
+
+  getTableColumnsName(index: number): string[] {
+    const curTableName = this.columns
+      .at(index)
+      .get('foreignTable')
+      ?.get('tableName')?.value;
+    console.log(curTableName);
+    return this.dbTables
+      .filter((t) => {
+        return t.name === curTableName;
+      })
+      .flatMap((t) => t.columns!.map((c) => c.name));
   }
 
   addColumn(): void {
@@ -113,9 +135,21 @@ export class CreateTableComponent implements OnInit {
       columnConstraints: this.formBuilder.array(
         Object.keys(this.constraints).map((key) => false)
       ),
+      foreignTable: this.formBuilder.group({
+        tableName: '',
+        columnName: '',
+      }),
     });
     this.columns.push(columnForm);
   }
+
+  // addForeignTable(): void {
+  //   const foreignTableForm = this.formBuilder.group({
+  //     tableName: '',
+  //     columnName: '',
+  //   });
+  //   this.foreignTables.push(foreignTableForm);
+  // }
 
   removeColumn(index: number): void {
     if (this.columns.length > 1) {
@@ -124,6 +158,7 @@ export class CreateTableComponent implements OnInit {
   }
 
   submit(): void {
+    console.log(this.form.getRawValue());
     const newColumns = this.form.getRawValue().columns.map((c: any) => {
       let t = c.columnConstraints
         .map((v: any, i: number) => v && this.constraints[i])
@@ -142,17 +177,9 @@ export class CreateTableComponent implements OnInit {
       columns: valueToSave.columns,
     };
 
-    this.tableService
-      .save(createTableRequest)
-      // .pipe(
-      //   catchError((err) => {
-      //     this.errorService.openError([err.error.error]);
-      //     return EMPTY;
-      //   })
-      // )
-      .subscribe((res) => {
-        this.router.navigate(['dbs', this.dbId]);
-      });
+    // this.tableService.save(createTableRequest).subscribe((res) => {
+    //   this.router.navigate(['dbs', this.dbId]);
+    // });
   }
 
   validate(formControl: FormControl): boolean {

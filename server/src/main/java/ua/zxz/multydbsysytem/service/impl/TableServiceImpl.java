@@ -19,7 +19,6 @@ import ua.zxz.multydbsysytem.service.DbService;
 import ua.zxz.multydbsysytem.service.TableService;
 import ua.zxz.multydbsysytem.util.DbColumnToDtoTransformer;
 import ua.zxz.multydbsysytem.web.payload.TablePayload;
-import ua.zxz.multydbsysytem.web.payload.TableResponse;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +47,10 @@ public class TableServiceImpl implements TableService {
         if (!dbService.userHasRightsToDb(tableEntity.getDb().getId(), username)) {
             throw new WrongDataException("Can't get the table");
         }
+        return getTableDto(tableEntity);
+    }
+
+    private TableDto getTableDto(TableEntity tableEntity) {
         List<FieldDto> fields = jdbcTemplate.query(
                 GET_TABLE_INFORMATION_QUERY,
                 r -> {
@@ -71,11 +74,16 @@ public class TableServiceImpl implements TableService {
     }
 
     @Override
-    public List<TableResponse> getAllTablesByDb(Long dbId, String username) {
+    public List<TableDto> getAllTablesByDb(Long dbId, String username) {
         if (!dbService.userHasRightsToDb(dbId, username)) {
             throw new WrongDataException("Can't get tables, something went wrong");
         }
-        return tableMapper.entitiesToResponse(tableRepository.findAllByDbId(dbId));
+        List<TableEntity> tables = tableRepository.findAllByDbId(dbId);
+        List<TableDto> tableDtos = new ArrayList<>();
+        for (TableEntity table : tables) {
+            tableDtos.add(getTableDto(table));
+        }
+        return tableDtos;
     }
 
     @Transactional
