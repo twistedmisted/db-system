@@ -1,4 +1,4 @@
-package ua.zxz.multydbsysytem.web.payload;
+package ua.zxz.multydbsysytem.web.payload.table;
 
 import lombok.Data;
 

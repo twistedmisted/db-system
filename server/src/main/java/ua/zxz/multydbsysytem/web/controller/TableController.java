@@ -4,10 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ua.zxz.multydbsysytem.dto.TableDto;
+import ua.zxz.multydbsysytem.dto.table.TableDto;
 import ua.zxz.multydbsysytem.service.TableService;
-import ua.zxz.multydbsysytem.web.payload.TablePayload;
-import ua.zxz.multydbsysytem.web.payload.TableUpdateRequest;
+import ua.zxz.multydbsysytem.web.payload.table.CrateTablePayload;
+import ua.zxz.multydbsysytem.web.payload.table.TableUpdateRequest;
 
 import java.security.Principal;
 import java.util.Map;
@@ -33,8 +33,8 @@ public class TableController {
     }
 
     @PostMapping
-    public ResponseEntity<Object> createTable(@RequestBody TablePayload tablePayload, Principal principal) {
-        tableService.create(tablePayload, principal.getName());
+    public ResponseEntity<Object> createTable(@RequestBody CrateTablePayload crateTablePayload, Principal principal) {
+        tableService.create(crateTablePayload, principal.getName());
         return new ResponseEntity<>(OK);
     }
 

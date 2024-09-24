@@ -1,4 +1,4 @@
-package ua.zxz.multydbsysytem.dto;
+package ua.zxz.multydbsysytem.dto.table;
 
 import lombok.Data;
 

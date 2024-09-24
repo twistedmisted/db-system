@@ -1,4 +1,4 @@
-package ua.zxz.multydbsysytem.dto;
+package ua.zxz.multydbsysytem.dto.table;
 
 import lombok.Data;
 import lombok.Getter;
@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Data
-public class FieldType {
+public class ColumnType {
 
     private Type type;
     private String value = null;

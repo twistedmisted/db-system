@@ -1,4 +1,4 @@
-package ua.zxz.multydbsysytem.web.payload;
+package ua.zxz.multydbsysytem.web.payload.table;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;

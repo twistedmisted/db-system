@@ -21,4 +21,7 @@ public interface TableRepository extends CrudRepository<TableEntity, Long> {
     int userHasAccessToTable(Long tableId, String username);
 
     Optional<TableEntity> findByNameAndDbId(String tableName, Long dbId);
+
+    @Query("SELECT t.name FROM TableEntity t WHERE t.id = :id")
+    String findNameById(Long id);
 }

@@ -1,14 +1,12 @@
-import { Component, OnInit } from '@angular/core';
-import { TableService } from '../../service/table.service';
-import { Table } from '../../models/table.model';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { CommonModule } from '@angular/common';
-import { Constraint } from '../../models/constraint.model';
-import { ColumnService } from '../../service/column.service';
-import { ApiInfoComponent } from '../api-info/api-info.component';
-import { MessageResponse } from '../../models/response/MessageResponse';
-import { MessageService } from '../../service/message.service';
-import { ErrorBlockComponent } from '../error-block/error-block.component';
+import {Component, OnInit} from '@angular/core';
+import {TableService} from '../../service/table.service';
+import {Table} from '../../models/table.model';
+import {ActivatedRoute, Router, RouterModule} from '@angular/router';
+import {CommonModule} from '@angular/common';
+import {ColumnService} from '../../service/column.service';
+import {ApiInfoComponent} from '../api-info/api-info.component';
+import {MessageService} from '../../service/message.service';
+import {ErrorBlockComponent} from '../error-block/error-block.component';
 
 @Component({
   selector: 'app-table',
@@ -25,10 +23,11 @@ export class TableComponent implements OnInit {
   constructor(
     private tableService: TableService,
     private columnService: ColumnService,
-    private messageSerivce: MessageService,
+    private messageService: MessageService,
     private activatedRoute: ActivatedRoute,
     private router: Router
-  ) {}
+  ) {
+  }
 
   ngOnInit(): void {
     this.dbId = this.activatedRoute.snapshot.paramMap.get('dbId')!;
@@ -41,7 +40,15 @@ export class TableComponent implements OnInit {
       .subscribe((res) => {
         this.table = res.result;
         this.constraints = this.table.columns!.map((c) =>
-          c.constraints.filter((v) => v.statusValue).map((v) => v.value)
+          c.constraints
+            .filter((v) => v.statusValue)
+            .map((v) => {
+              debugger;
+              if (v.value === 'FOREIGN KEY') {
+                return `${v.value}[${c.foreignTable.tableName}(${c.foreignTable.columnName})]`;
+              }
+              return v.value
+            })
         );
       });
   }
@@ -54,7 +61,7 @@ export class TableComponent implements OnInit {
 
   deleteColumnByName(columnName: string) {
     this.columnService.delete(this.table.id!, columnName).subscribe((res) => {
-      this.messageSerivce.openSuccess(res.message);
+      this.messageService.openSuccess(res.message);
       this.ngOnInit();
     });
   }

@@ -1,4 +1,4 @@
-package ua.zxz.multydbsysytem.dto;
+package ua.zxz.multydbsysytem.dto.table;
 
 import lombok.Data;
 
@@ -10,5 +10,5 @@ public class TableDto {
 
     private Long id;
     private String name;
-    private List<FieldDto> columns = new ArrayList<>();
+    private List<ColumnDto> columns = new ArrayList<>();
 }

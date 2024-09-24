@@ -11,13 +11,14 @@ import {
 } from '@angular/forms';
 import { Router } from '@angular/router';
 import { FieldTypeService } from '../../service/fieldtype.service';
-import { BehaviorSubject, catchError, EMPTY } from 'rxjs';
+import {BehaviorSubject, catchError, EMPTY, takeLast} from 'rxjs';
 import { ConstraintService } from '../../service/constraint.service';
 import { Constraint } from '../../models/constraint.model';
 import { TableService } from '../../service/table.service';
 import { CreateTableRequest } from '../../models/request/CreateTableRequest';
 import { ErrorBlockComponent } from '../error-block/error-block.component';
 import { Table } from '../../models/table.model';
+import {create} from "node:domain";
 
 @Component({
   selector: 'app-create-table',
@@ -36,8 +37,6 @@ export class CreateTableComponent implements OnInit {
   fieldTypes$ = new BehaviorSubject<string[]>([]);
   constraints!: Constraint[];
   dbTables!: Table[];
-  tableColumnsNames!: string[];
-  tableSelected: any;
 
   private dbId = history.state.dbId;
 
@@ -110,7 +109,6 @@ export class CreateTableComponent implements OnInit {
       .at(index)
       .get('foreignTable')
       ?.get('tableName')?.value;
-    console.log(curTableName);
     return this.dbTables
       .filter((t) => {
         return t.name === curTableName;
@@ -143,14 +141,6 @@ export class CreateTableComponent implements OnInit {
     this.columns.push(columnForm);
   }
 
-  // addForeignTable(): void {
-  //   const foreignTableForm = this.formBuilder.group({
-  //     tableName: '',
-  //     columnName: '',
-  //   });
-  //   this.foreignTables.push(foreignTableForm);
-  // }
-
   removeColumn(index: number): void {
     if (this.columns.length > 1) {
       this.columns.removeAt(index);
@@ -158,13 +148,20 @@ export class CreateTableComponent implements OnInit {
   }
 
   submit(): void {
-    console.log(this.form.getRawValue());
     const newColumns = this.form.getRawValue().columns.map((c: any) => {
       let t = c.columnConstraints
         .map((v: any, i: number) => v && this.constraints[i])
         .filter((v: any) => !!v);
+      let ft;
+      if (t.find((e: Constraint) => e.value === 'FOREIGN KEY')) {
+        const tableId = this.dbTables.find((t) => {
+          return t.name === c.foreignTable['tableName'];
+        })!.id;
+        ft = Object.assign({}, c.foreignTable, {tableName: `table_${tableId}`});
+      }
       return Object.assign({}, c, {
         columnConstraints: t,
+        foreignTable: ft,
       });
     });
     const valueToSave = Object.assign({}, this.form.value, {
@@ -177,9 +174,9 @@ export class CreateTableComponent implements OnInit {
       columns: valueToSave.columns,
     };
 
-    // this.tableService.save(createTableRequest).subscribe((res) => {
-    //   this.router.navigate(['dbs', this.dbId]);
-    // });
+    this.tableService.save(createTableRequest).subscribe((res) => {
+      this.router.navigate(['dbs', this.dbId]);
+    });
   }
 
   validate(formControl: FormControl): boolean {

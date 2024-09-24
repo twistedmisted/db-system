@@ -1,10 +1,10 @@
 package ua.zxz.multydbsysytem.mapper.impl;
 
 import org.springframework.stereotype.Component;
-import ua.zxz.multydbsysytem.dto.TableDto;
+import ua.zxz.multydbsysytem.dto.table.TableDto;
 import ua.zxz.multydbsysytem.entity.TableEntity;
 import ua.zxz.multydbsysytem.mapper.Mapper;
-import ua.zxz.multydbsysytem.web.payload.TableResponse;
+import ua.zxz.multydbsysytem.web.payload.table.TableResponse;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -6,7 +6,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ua.zxz.multydbsysytem.service.ColumnService;
 import ua.zxz.multydbsysytem.web.payload.ColumnNamePayload;
-import ua.zxz.multydbsysytem.web.payload.TablePayload;
+import ua.zxz.multydbsysytem.web.payload.table.CrateTablePayload;
 
 import java.security.Principal;
 import java.util.Map;
@@ -33,7 +33,7 @@ public class ColumnController {
 
     @PostMapping("/addColumn")
     public ResponseEntity<Object> addNewColumn(@RequestParam Long tableId,
-                                               @RequestBody TablePayload.Column column,
+                                               @RequestBody CrateTablePayload.Column column,
                                                Principal principal) {
         columnService.addNewColumn(tableId, column, principal.getName());
         return new ResponseEntity<>(Map.of("message", "Column successfully added"), OK);

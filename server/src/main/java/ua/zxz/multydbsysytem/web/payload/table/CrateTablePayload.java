@@ -1,18 +1,19 @@
-package ua.zxz.multydbsysytem.web.payload;
+package ua.zxz.multydbsysytem.web.payload.table;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import ua.zxz.multydbsysytem.dto.FieldSettings;
-import ua.zxz.multydbsysytem.dto.FieldType;
+import ua.zxz.multydbsysytem.dto.table.ColumnConstraint;
+import ua.zxz.multydbsysytem.dto.table.ColumnType;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 @Data
-public class TablePayload {
+public class CrateTablePayload {
 
     @NotNull(message = "Database can't be null")
     private Long dbId;
@@ -31,16 +32,31 @@ public class TablePayload {
         private String name;
 
         @JsonProperty("columnType")
-        @NotNull(message = "FieldType can't be null")
-        private FieldType type;
+        @NotNull(message = "ColumnType can't be null")
+        private ColumnType type;
 
         @JsonProperty("columnConstraints")
-        private List<FieldSettings> settings = new ArrayList<>();
+        private List<ColumnConstraint> constraints = new ArrayList<>();
+
+        @JsonProperty("foreignTable")
+        private ForeignTable foreignTable;
 
         public String getType() {
             return Objects.nonNull(type.getValue()) ?
                     type.getType() + "(" + type.getValue() + ")" :
                     type.getType().name();
         }
+    }
+
+    @Data
+    public static class ForeignTable {
+
+        @NotNull(message = "Foreign table name can't be null")
+        @NotBlank(message = "Foreign table name can't be blank")
+        private String tableName;
+
+        @NotNull(message = "Foreign table column can't be null")
+        @NotBlank(message = "Foreign table column can't be blank")
+        private String columnName;
     }
 }

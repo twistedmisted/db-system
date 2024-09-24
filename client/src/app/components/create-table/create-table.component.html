@@ -122,9 +122,9 @@
                   </div>
                 </div>
               </div>
-              <div class="d-flex" formGroupName="foreignTable">
+              <div *ngIf="constraint.value === 'FOREIGN KEY'" class="d-flex" formGroupName="foreignTable">
                 <select
-                  class="form-select ms-3"
+                  class="form-select"
                   [value]="['change']"
                   (change)="updateColumnsList(i)"
                   formControlName="tableName"

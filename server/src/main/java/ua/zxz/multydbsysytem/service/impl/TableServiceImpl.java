@@ -5,10 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
-import ua.zxz.multydbsysytem.dto.DbDto;
-import ua.zxz.multydbsysytem.dto.FieldDto;
-import ua.zxz.multydbsysytem.dto.TableDto;
+import ua.zxz.multydbsysytem.dto.table.*;
 import ua.zxz.multydbsysytem.entity.TableEntity;
 import ua.zxz.multydbsysytem.exception.WrongDataException;
 import ua.zxz.multydbsysytem.mapper.impl.TableMapper;
@@ -17,13 +14,10 @@ import ua.zxz.multydbsysytem.repository.TableRepository;
 import ua.zxz.multydbsysytem.service.ColumnService;
 import ua.zxz.multydbsysytem.service.DbService;
 import ua.zxz.multydbsysytem.service.TableService;
-import ua.zxz.multydbsysytem.util.DbColumnToDtoTransformer;
-import ua.zxz.multydbsysytem.web.payload.TablePayload;
+import ua.zxz.multydbsysytem.util.SqlToDtoTransformer;
+import ua.zxz.multydbsysytem.web.payload.table.CrateTablePayload;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -34,6 +28,11 @@ public class TableServiceImpl implements TableService {
             SELECT COLUMN_NAME, IS_NULLABLE, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH, AUTO_INCREMENT, UNIQUE_COLUMN, PRIMARY_KEY, IS_IDENTITY
             FROM INFORMATION_SCHEMA.COLUMNS
             WHERE table_name = ?;""";
+
+    private static final String GET_KEY_COLUMN_USAGE = """
+            SELECT COLUMN_NAME, REFERENCED_CONSTRAINT_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME
+            FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+            WHERE CONSTRAINT_TYPE = 'FOREIGN KEY' AND table_name = ?;""";
 
     private final JdbcTemplate jdbcTemplate;
     private final DbService dbService;
@@ -51,21 +50,54 @@ public class TableServiceImpl implements TableService {
     }
 
     private TableDto getTableDto(TableEntity tableEntity) {
-        List<FieldDto> fields = jdbcTemplate.query(
+        Map<String, ColumnDto> columnsByName = getColumns(tableEntity);
+        List<ForeignTableDto> foreignTables = getForeignTables(tableEntity.getId());
+        if (!foreignTables.isEmpty() && !columnsByName.isEmpty()) {
+            foreignTables.forEach(ft -> {
+                ColumnDto columnDto = columnsByName.get(ft.getTableColumn());
+                if (Objects.nonNull(columnDto)) {
+                    String techName = ft.getTableName();
+                    ft.setTableName(tableRepository.findNameById(Long.valueOf(techName.substring(techName.indexOf("_") + 1))));
+                    columnDto.setForeignTable(ft);
+                    columnDto.getConstraints().add(new ColumnConstraint(Constraints.FOREIGN_KEY, true));
+                }
+            });
+        }
+        TableDto tableDto = new TableDto();
+        tableDto.setId(tableEntity.getId());
+        tableDto.setName(tableEntity.getName());
+        tableDto.setColumns(new ArrayList<>(columnsByName.values()));
+        return tableDto;
+    }
+
+    private List<ForeignTableDto> getForeignTables(Long tableId) {
+        List<ForeignTableDto> tables = jdbcTemplate.query(
+                GET_KEY_COLUMN_USAGE,
+                r -> {
+                    List<ForeignTableDto> result = new ArrayList<>();
+                    while (r.next()) {
+                        result.add(SqlToDtoTransformer.transformForeignTable(r));
+                    }
+                    return result;
+                },
+                "table_" + tableId
+        );
+        return Objects.isNull(tables) ? Collections.emptyList() : tables;
+    }
+
+    private Map<String, ColumnDto> getColumns(TableEntity tableEntity) {
+        Map<String, ColumnDto> columns = jdbcTemplate.query(
                 GET_TABLE_INFORMATION_QUERY,
                 r -> {
-                    List<FieldDto> result = new ArrayList<>();
+                    Map<String, ColumnDto> result = new LinkedHashMap<>();
                     while (r.next()) {
-                        result.add(DbColumnToDtoTransformer.transform(r));
+                        ColumnDto columnDto = SqlToDtoTransformer.transformColumn(r);
+                        result.put(columnDto.getName(), columnDto);
                     }
                     return result;
                 },
                 "table_" + tableEntity.getId());
-        TableDto tableDto = new TableDto();
-        tableDto.setId(tableEntity.getId());
-        tableDto.setName(tableEntity.getName());
-        tableDto.setColumns(fields);
-        return tableDto;
+        return Objects.isNull(columns) ? Collections.emptyMap() : columns;
     }
 
     private TableEntity getTableById(Long id) {
@@ -88,20 +120,21 @@ public class TableServiceImpl implements TableService {
 
     @Transactional
     @Override
-    public void create(TablePayload table, String username) {
+    public void create(CrateTablePayload table, String username) {
         if (!dbService.userHasRightsToDb(table.getDbId(), username)) {
             throw new WrongDataException("Can't create table, something went wrong");
         }
         if (dbService.dbAlreadyHasTableWithName(table.getDbId(), table.getName())) {
             throw new WrongDataException("The table with name " + table.getName() + " already exists in this database");
         }
-        DbDto dbDto = dbService.getById(table.getDbId());
         TableEntity tableEntity = new TableEntity();
         tableEntity.setName(table.getName());
-//        tableEntity.setTechName(tableName);
         tableEntity.setDb(dbRepository.findById(table.getDbId()).get());
         tableEntity = tableRepository.save(tableEntity);
-//        String tableName = username + "_" + dbDto.getName() + "_" + table.getName();
+        createSqlTable(table, tableEntity);
+    }
+
+    private void createSqlTable(CrateTablePayload table, TableEntity tableEntity) {
         String tableName = "table_" + tableEntity.getId();
         String firstPart = "CREATE TABLE " + tableName + "(";
         StringBuilder tableCreationSql = new StringBuilder(firstPart);
@@ -112,7 +145,6 @@ public class TableServiceImpl implements TableService {
             }
         }
         tableCreationSql.append(")");
-        log.info(tableCreationSql.toString());
         jdbcTemplate.update(tableCreationSql.toString());
     }
 

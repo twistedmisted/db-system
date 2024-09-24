@@ -3,16 +3,13 @@ package ua.zxz.multydbsysytem.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
-import ua.zxz.multydbsysytem.dto.FieldDto;
+import ua.zxz.multydbsysytem.dto.table.ColumnDto;
 import ua.zxz.multydbsysytem.entity.TableEntity;
 import ua.zxz.multydbsysytem.exception.WrongDataException;
 import ua.zxz.multydbsysytem.repository.TableRepository;
 import ua.zxz.multydbsysytem.service.ColumnService;
-import ua.zxz.multydbsysytem.util.DbColumnToDtoTransformer;
-import ua.zxz.multydbsysytem.web.payload.TablePayload;
-
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import ua.zxz.multydbsysytem.util.SqlToDtoTransformer;
+import ua.zxz.multydbsysytem.web.payload.table.CrateTablePayload;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +24,7 @@ public class ColumnServiceImpl implements ColumnService {
     private final TableRepository tableRepository;
 
     @Override
-    public void addNewColumn(Long tableId, TablePayload.Column column, String username) {
+    public void addNewColumn(Long tableId, CrateTablePayload.Column column, String username) {
         if (tableRepository.userHasAccessToTable(tableId, username) != 1) {
             throw new WrongDataException("Can't add new column, something went wrong");
         }
@@ -43,14 +40,14 @@ public class ColumnServiceImpl implements ColumnService {
     }
 
     @Override
-    public FieldDto getColumnByName(Long tableId, String columnName, String username) {
+    public ColumnDto getColumnByName(Long tableId, String columnName, String username) {
         TableEntity tableEntity = getTableById(tableId);
         if (!tableEntity.getDb().getUser().getUsername().equals(username)) {
             throw new WrongDataException("Can't get the table");
         }
         return jdbcTemplate.query(
                 GET_COLUMN_INFORMATION_QUERY,
-                r -> r.next() ? DbColumnToDtoTransformer.transform(r) : null,
+                r -> r.next() ? SqlToDtoTransformer.transformColumn(r) : null,
                 "table_" + tableEntity.getId(), columnName
         );
     }
