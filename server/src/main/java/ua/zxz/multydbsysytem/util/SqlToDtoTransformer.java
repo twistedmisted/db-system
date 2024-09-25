@@ -23,6 +23,7 @@ public class SqlToDtoTransformer {
                 r.getString("PRIMARY_KEY"),
                 r.getString("IS_IDENTITY")
         ));
+        field.setDefaultValue(r.getString("COLUMN_DEFAULT"));
         return field;
     }
 

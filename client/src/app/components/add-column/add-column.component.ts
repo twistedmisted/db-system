@@ -15,8 +15,8 @@ import { Constraint } from '../../models/constraint.model';
 import { ColumnService } from '../../service/column.service';
 import { MessageService } from '../../service/message.service';
 import { ErrorBlockComponent } from '../error-block/error-block.component';
-import {Table} from "../../models/table.model";
-import {TableService} from "../../service/table.service";
+import { Table } from '../../models/table.model';
+import { TableService } from '../../service/table.service';
 
 @Component({
   selector: 'app-add-column',
@@ -80,6 +80,7 @@ export class AddColumnComponent implements OnInit {
         tableName: '',
         columnName: '',
       }),
+      defaultValue: '',
     });
   }
 
@@ -117,17 +118,28 @@ export class AddColumnComponent implements OnInit {
     let ft;
     if (constraintsToSave.find((e: Constraint) => e.value === 'FOREIGN KEY')) {
       if (this.form.value.foreignTable.tableName === '') {
-        this.messageService.openError(['Need to specify a foreign table name for column ' + this.form.value.name])
+        this.messageService.openError([
+          'Need to specify a foreign table name for column ' +
+            this.form.value.name,
+        ]);
         throw new Error('Need to specify a table name ' + this.form.value.name);
       }
       if (this.form.value.foreignTable.columnName === '') {
-        this.messageService.openError(['Need to specify a foreign column name for column ' + this.form.value.name])
-        throw new Error('Need to specify a foreign column name for column ' + this.form.value.name);
+        this.messageService.openError([
+          'Need to specify a foreign column name for column ' +
+            this.form.value.name,
+        ]);
+        throw new Error(
+          'Need to specify a foreign column name for column ' +
+            this.form.value.name
+        );
       }
       const tableId = this.dbTables.find((t) => {
         return t.name === this.form.value.foreignTable['tableName'];
       })!.id;
-      ft = Object.assign({}, this.form.value.foreignTable, {tableName: `table_${tableId}`});
+      ft = Object.assign({}, this.form.value.foreignTable, {
+        tableName: `table_${tableId}`,
+      });
     }
 
     const valueToSave = Object.assign({}, this.form.value, {

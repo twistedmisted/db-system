@@ -5,6 +5,8 @@ import ua.zxz.multydbsysytem.dto.table.ColumnDto;
 import ua.zxz.multydbsysytem.dto.table.Constraints;
 import ua.zxz.multydbsysytem.web.payload.table.CrateTablePayload;
 
+import java.util.Objects;
+
 public interface ColumnService {
 
     void addNewColumn(Long tableId, CrateTablePayload.Column column, String username);
@@ -25,6 +27,10 @@ public interface ColumnService {
                 continue;
             }
             sb.append(constraint.getValue()).append(" ");
+        }
+        String defaultValue = column.getDefaultValue();
+        if (Objects.nonNull(defaultValue) && !defaultValue.isBlank()) {
+            sb.append("DEFAULT ").append(defaultValue);
         }
         return column.getName() + " " + column.getType() + " " + sb.toString().trim();
     }

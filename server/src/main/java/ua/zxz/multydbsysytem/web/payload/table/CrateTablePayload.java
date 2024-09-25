@@ -41,6 +41,8 @@ public class CrateTablePayload {
         @JsonProperty("foreignTable")
         private ForeignTable foreignTable;
 
+        private String defaultValue;
+
         public String getType() {
             return Objects.nonNull(type.getValue()) ?
                     type.getType() + "(" + type.getValue() + ")" :

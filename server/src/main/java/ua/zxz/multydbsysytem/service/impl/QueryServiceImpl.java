@@ -69,7 +69,7 @@ public class QueryServiceImpl implements QueryService {
     @Override
     public void save(long dbId, String tableName, Map<String, Object> object) {
         TableEntity tableEntity = getTableEntity(dbId, tableName);
-//        String columns = String.join(",", object.keySet());
+        String columns = String.join(" = ?, ", object.keySet()) + " = ?";
         String parametersCount = String.join(",", Collections.nCopies(object.size(), "?"));
 //        KeyHolder keyHolder = new GeneratedKeyHolder();
 //        return jdbcTemplate.update(
@@ -78,7 +78,7 @@ public class QueryServiceImpl implements QueryService {
         jdbcTemplate.update(
                 con -> {
                     PreparedStatement ps = con.prepareStatement(
-                            String.format("INSERT INTO table_" + tableEntity.getId() + " VALUES (%s);", parametersCount)
+                            String.format("INSERT INTO table_" + tableEntity.getId() + " SET %s;", columns)
 //                            Statement.RETURN_GENERATED_KEYS
                     );
                     int index = 1;

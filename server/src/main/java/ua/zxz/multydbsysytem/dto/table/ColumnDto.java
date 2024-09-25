@@ -12,4 +12,5 @@ public class ColumnDto {
     private ColumnType type;
     private List<ColumnConstraint> constraints = new ArrayList<>();
     private ForeignTableDto foreignTable;
+    private String defaultValue;
 }

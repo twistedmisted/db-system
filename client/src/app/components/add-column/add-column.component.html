@@ -43,7 +43,7 @@
 
           <div class="mb-3">
             <label id="valueLabel" for="valueField" class="form-label"
-            >Type Value</label
+              >Type Value</label
             >
             <input
               type="text"
@@ -71,10 +71,14 @@
                   [formControlName]="i"
                 />
                 <span class="form-check-label">
-                {{ constraint.value }}
-              </span>
+                  {{ constraint.value }}
+                </span>
               </div>
-              <div *ngIf="constraint.value === 'FOREIGN KEY'" class="d-flex" formGroupName="foreignTable">
+              <div
+                *ngIf="constraint.value === 'FOREIGN KEY'"
+                class="d-flex"
+                formGroupName="foreignTable"
+              >
                 <select
                   class="form-select"
                   [value]="['change']"
@@ -103,6 +107,18 @@
             </div>
           </div>
         </fieldset>
+
+        <div class="mb-3">
+          <label id="defaultValueLabel" for="valueField" class="form-label"
+            >Default Value</label
+          >
+          <input
+            id="defaultValue"
+            formControlName="defaultValue"
+            placeholder="Enter default value expression"
+            class="form-control w-100"
+          />
+        </div>
 
         <button type="submit" class="btn btn-primary">Add Column</button>
       </form>

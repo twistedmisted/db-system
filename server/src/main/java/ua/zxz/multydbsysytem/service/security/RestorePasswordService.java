@@ -6,7 +6,6 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 import ua.zxz.multydbsysytem.dto.PasswordMessageInfo;
 import ua.zxz.multydbsysytem.entity.UserEntity;
 import ua.zxz.multydbsysytem.exception.WrongDataException;
@@ -16,8 +15,6 @@ import ua.zxz.multydbsysytem.service.mail.MailService;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Slf4j
 @Service

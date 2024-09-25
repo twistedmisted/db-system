@@ -35,6 +35,7 @@
               <th>Column Name</th>
               <th>Column Type</th>
               <th>Constraints</th>
+              <th>Default Value</th>
               <th class="text-center">Actions</th>
             </tr>
           </thead>
@@ -51,6 +52,7 @@
                 }}
               </td>
               <td>{{ constraints[i].join(", ") }}</td>
+              <td>{{ column.defaultValue }}</td>
               <td class="text-center">
                 <button
                   class="btn btn-sm btn-warning me-2"

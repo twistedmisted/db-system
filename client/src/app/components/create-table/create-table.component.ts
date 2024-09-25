@@ -1,5 +1,5 @@
-import {CommonModule} from '@angular/common';
-import {Component, OnInit} from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
 import {
   FormArray,
   FormBuilder,
@@ -9,16 +9,16 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import {Router} from '@angular/router';
-import {FieldTypeService} from '../../service/fieldtype.service';
-import {BehaviorSubject} from 'rxjs';
-import {ConstraintService} from '../../service/constraint.service';
-import {Constraint} from '../../models/constraint.model';
-import {TableService} from '../../service/table.service';
-import {CreateTableRequest} from '../../models/request/CreateTableRequest';
-import {ErrorBlockComponent} from '../error-block/error-block.component';
-import {Table} from '../../models/table.model';
-import {MessageService} from "../../service/message.service";
+import { Router } from '@angular/router';
+import { FieldTypeService } from '../../service/fieldtype.service';
+import { BehaviorSubject } from 'rxjs';
+import { ConstraintService } from '../../service/constraint.service';
+import { Constraint } from '../../models/constraint.model';
+import { TableService } from '../../service/table.service';
+import { CreateTableRequest } from '../../models/request/CreateTableRequest';
+import { ErrorBlockComponent } from '../error-block/error-block.component';
+import { Table } from '../../models/table.model';
+import { MessageService } from '../../service/message.service';
 
 @Component({
   selector: 'app-create-table',
@@ -136,6 +136,7 @@ export class CreateTableComponent implements OnInit {
         tableName: '',
         columnName: '',
       }),
+      defaultValue: '',
     });
     this.columns.push(columnForm);
   }
@@ -154,17 +155,25 @@ export class CreateTableComponent implements OnInit {
       let ft;
       if (t.find((e: Constraint) => e.value === 'FOREIGN KEY')) {
         if (c.foreignTable.tableName === '') {
-          this.messageService.openError(['Need to specify a foreign table name for column ' + c.name])
+          this.messageService.openError([
+            'Need to specify a foreign table name for column ' + c.name,
+          ]);
           throw new Error('Need to specify a table name ' + c.name);
         }
         if (c.foreignTable.columnName === '') {
-          this.messageService.openError(['Need to specify a foreign column name for column ' + c.name])
-          throw new Error('Need to specify a foreign column name for column ' + c.name);
+          this.messageService.openError([
+            'Need to specify a foreign column name for column ' + c.name,
+          ]);
+          throw new Error(
+            'Need to specify a foreign column name for column ' + c.name
+          );
         }
         const tableId = this.dbTables.find((t) => {
           return t.name === c.foreignTable['tableName'];
         })!.id;
-        ft = Object.assign({}, c.foreignTable, {tableName: `table_${tableId}`});
+        ft = Object.assign({}, c.foreignTable, {
+          tableName: `table_${tableId}`,
+        });
       }
       return Object.assign({}, c, {
         columnConstraints: t,

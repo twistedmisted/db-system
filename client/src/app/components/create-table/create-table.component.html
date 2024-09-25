@@ -78,7 +78,7 @@
         </div>
         <div class="mb-1">
           <button
-            class="btn btn-secondary w-100"
+            class="btn btn-secondary w-100 mb-1"
             type="button"
             data-bs-toggle="collapse"
             [attr.data-bs-target]="['#collapseExample' + i]"
@@ -95,7 +95,7 @@
                 let constraintIndex = index
               "
             >
-              <div formArrayName="columnConstraints">
+              <div class="mb-1" formArrayName="columnConstraints">
                 <div>
                   <input
                     class="form-check-input"
@@ -107,7 +107,11 @@
                   </span>
                 </div>
               </div>
-              <div *ngIf="constraint.value === 'FOREIGN KEY'" class="d-flex" formGroupName="foreignTable">
+              <div
+                *ngIf="constraint.value === 'FOREIGN KEY'"
+                class="d-flex mb-3"
+                formGroupName="foreignTable"
+              >
                 <select
                   class="form-select"
                   [value]="['change']"
@@ -134,11 +138,19 @@
                 </select>
               </div>
             </div>
+            <div class="mb-1">
+              <input
+                id="defaultValue-{{ i }}"
+                formControlName="defaultValue"
+                placeholder="Enter default value expression"
+                class="form-control w-100"
+              />
+            </div>
           </div>
         </div>
         <button
           type="button"
-          class="btn btn-danger mb-3 w-100"
+          class="btn btn-danger mb-1 w-100"
           (click)="removeColumn(i)"
         >
           <i class="bi bi-dash-circle"></i>
@@ -148,7 +160,7 @@
     </div>
     <div class="w-100 text-center">
       <button
-        class="btn btn-primary mb-3 w-50"
+        class="btn btn-primary mb-1 w-50"
         type="button"
         (click)="addColumn()"
       >
