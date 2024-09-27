@@ -13,6 +13,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
+      console.log(error);
       if (error.error && !error.error.notification) {
         errorService.openError([error.error.error]);
         // return throwError(() => error);

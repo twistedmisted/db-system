@@ -32,10 +32,10 @@
         <table class="table table-bordered">
           <thead class="thead-light">
             <tr>
-              <th>Column Name</th>
-              <th>Column Type</th>
-              <th>Constraints</th>
-              <th>Default Value</th>
+              <th class="text-center">Column Name</th>
+              <th class="text-center">Column Type</th>
+              <th class="text-center">Constraints</th>
+              <th class="text-center">Default Value</th>
               <th class="text-center">Actions</th>
             </tr>
           </thead>
@@ -44,22 +44,32 @@
               *ngFor="let column of table.columns; let i = index"
               class="w-100"
             >
-              <th>{{ column.name }}</th>
-              <td>
+              <th class="text-center align-middle">{{ column.name }}</th>
+              <td class="text-center align-middle">
                 {{
-                  column.type.type +
-                    (column.type.value ? "(" + column.type.value + ")" : "")
+                  column.columnType.type +
+                    (column.columnType.value
+                      ? "(" + column.columnType.value + ")"
+                      : "")
                 }}
               </td>
-              <td>{{ constraints[i].join(", ") }}</td>
-              <td>{{ column.defaultValue }}</td>
-              <td class="text-center">
-                <button
-                  class="btn btn-sm btn-warning me-2"
-                  [routerLink]="['columns', column.name, 'edit']"
-                >
-                  Update
-                </button>
+              <td>
+                <ul>
+                  <li *ngFor="let constraint of getConstraints(column)">
+                    {{ constraint }}
+                  </li>
+                </ul>
+              </td>
+              <td class="text-center align-middle">
+                {{ column.defaultValue }}
+              </td>
+              <td class="text-center align-middle">
+<!--                <button-->
+<!--                  class="btn btn-sm btn-warning me-2"-->
+<!--                  [routerLink]="['columns', column.name, 'edit']"-->
+<!--                >-->
+<!--                  Update-->
+<!--                </button>-->
                 <button
                   class="btn btn-sm btn-danger"
                   (click)="deleteColumnByName(column.name)"

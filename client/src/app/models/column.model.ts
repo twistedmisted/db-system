@@ -1,11 +1,10 @@
-import { Constraint } from './constraint.model';
+import { Constraints } from './constraints.model';
 import { FieldType } from './fieldtype.model';
 import { ForeignTable } from './foreigntable.model';
 
 export interface Column {
   name: string;
-  type: FieldType;
-  constraints: Constraint[];
-  foreignTable: ForeignTable;
+  columnType: FieldType;
   defaultValue: string;
+  constraints: Constraints;
 }

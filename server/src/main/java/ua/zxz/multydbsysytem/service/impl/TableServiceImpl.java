@@ -5,10 +5,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
-import ua.zxz.multydbsysytem.dto.table.*;
+import ua.zxz.multydbsysytem.dto.table.ColumnDto;
+import ua.zxz.multydbsysytem.dto.table.ForeignTableDto;
+import ua.zxz.multydbsysytem.dto.table.TableDto;
 import ua.zxz.multydbsysytem.entity.TableEntity;
 import ua.zxz.multydbsysytem.exception.WrongDataException;
-import ua.zxz.multydbsysytem.mapper.impl.TableMapper;
 import ua.zxz.multydbsysytem.repository.DbRepository;
 import ua.zxz.multydbsysytem.repository.TableRepository;
 import ua.zxz.multydbsysytem.service.ColumnService;
@@ -38,7 +39,6 @@ public class TableServiceImpl implements TableService {
     private final DbService dbService;
     private final TableRepository tableRepository;
     private final DbRepository dbRepository;
-    private final TableMapper tableMapper;
 
     @Override
     public TableDto getTableById(Long id, String username) {
@@ -58,8 +58,7 @@ public class TableServiceImpl implements TableService {
                 if (Objects.nonNull(columnDto)) {
                     String techName = ft.getTableName();
                     ft.setTableName(tableRepository.findNameById(Long.valueOf(techName.substring(techName.indexOf("_") + 1))));
-                    columnDto.setForeignTable(ft);
-                    columnDto.getConstraints().add(new ColumnConstraint(Constraints.FOREIGN_KEY, true));
+                    columnDto.getConstraints().setForeignTable(ft);
                 }
             });
         }

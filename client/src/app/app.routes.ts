@@ -51,10 +51,10 @@ export const routes: Routes = [
         path: 'dbs/:dbId/tables/:tableId/columns/new',
         component: AddColumnComponent,
       },
-      {
-        path: 'dbs/:dbId/tables/:tableId/columns/:columnName/edit',
-        component: EditColumnComponent,
-      },
+      // {
+      //   path: 'dbs/:dbId/tables/:tableId/columns/:columnName/edit',
+      //   component: EditColumnComponent,
+      // },
       {
         path: 'add/db',
         component: CreateDbComponent,

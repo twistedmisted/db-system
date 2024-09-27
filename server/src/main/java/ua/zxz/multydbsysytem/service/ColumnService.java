@@ -1,32 +1,49 @@
 package ua.zxz.multydbsysytem.service;
 
-import ua.zxz.multydbsysytem.dto.table.ColumnConstraint;
 import ua.zxz.multydbsysytem.dto.table.ColumnDto;
 import ua.zxz.multydbsysytem.dto.table.Constraints;
-import ua.zxz.multydbsysytem.web.payload.table.CrateTablePayload;
+import ua.zxz.multydbsysytem.dto.table.ForeignTableDto;
 
 import java.util.Objects;
 
 public interface ColumnService {
 
-    void addNewColumn(Long tableId, CrateTablePayload.Column column, String username);
+    String PRIMARY_KEY = "PRIMARY KEY ";
+    String IDENTITY = "IDENTITY ";
+    String AUTO_INCREMENT = "AUTO_INCREMENT ";
+    String REFERENCES = "REFERENCES ";
+    String NOT_NULL = "NOT NULL ";
+    String UNIQUE = "UNIQUE ";
+
+    void addNewColumn(Long tableId, ColumnDto column, String username);
 
     void deleteColumn(Long tableId, String columnName, String username);
 
-    static String mapToSqlColumn(CrateTablePayload.Column column) {
+    static String mapToSqlColumn(ColumnDto column) {
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < column.getConstraints().size(); i++) {
-            ColumnConstraint constraint = column.getConstraints().get(i);
-            if (Constraints.FOREIGN_KEY.equals(constraint.getValue())) {
-                CrateTablePayload.ForeignTable foreignTable = column.getForeignTable();
-                sb.append("REFERENCES ")
-                        .append(foreignTable.getTableName())
-                        .append(" (")
-                        .append(foreignTable.getColumnName())
-                        .append(") ");
-                continue;
-            }
-            sb.append(constraint.getValue()).append(" ");
+        Constraints constraints = column.getConstraints();
+        if (constraints.isPrimaryKey()) {
+            sb.append(PRIMARY_KEY);
+        }
+        if (column.getConstraints().getForeignTable().isForeignKey()) {
+            ForeignTableDto foreignTable = column.getConstraints().getForeignTable();
+            sb.append(REFERENCES)
+                    .append(foreignTable.getTableName())
+                    .append(" (")
+                    .append(foreignTable.getColumnName())
+                    .append(") ");
+        }
+        if (constraints.isIdentity()) {
+            sb.append(IDENTITY);
+        }
+        if (constraints.isAutoIncrement()) {
+            sb.append(AUTO_INCREMENT);
+        }
+        if (constraints.isNotNull()) {
+            sb.append(NOT_NULL);
+        }
+        if (constraints.isUnique()) {
+            sb.append(UNIQUE);
         }
         String defaultValue = column.getDefaultValue();
         if (Objects.nonNull(defaultValue) && !defaultValue.isBlank()) {

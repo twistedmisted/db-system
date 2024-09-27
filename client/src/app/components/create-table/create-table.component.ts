@@ -12,8 +12,6 @@ import {
 import { Router } from '@angular/router';
 import { FieldTypeService } from '../../service/fieldtype.service';
 import { BehaviorSubject } from 'rxjs';
-import { ConstraintService } from '../../service/constraint.service';
-import { Constraint } from '../../models/constraint.model';
 import { TableService } from '../../service/table.service';
 import { CreateTableRequest } from '../../models/request/CreateTableRequest';
 import { ErrorBlockComponent } from '../error-block/error-block.component';
@@ -35,7 +33,6 @@ import { MessageService } from '../../service/message.service';
 export class CreateTableComponent implements OnInit {
   form!: FormGroup;
   fieldTypes$ = new BehaviorSubject<string[]>([]);
-  constraints!: Constraint[];
   dbTables!: Table[];
 
   private dbId = history.state.dbId;
@@ -43,7 +40,6 @@ export class CreateTableComponent implements OnInit {
   constructor(
     private tableService: TableService,
     private fieldTypeService: FieldTypeService,
-    private constraintService: ConstraintService,
     private messageService: MessageService,
     private router: Router,
     private formBuilder: FormBuilder
@@ -52,7 +48,6 @@ export class CreateTableComponent implements OnInit {
   ngOnInit(): void {
     this.initFormGroup();
 
-    this.initConstraints();
     this.initFieldTypes();
 
     this.initTablesByDbId();
@@ -77,26 +72,11 @@ export class CreateTableComponent implements OnInit {
     this.fieldTypes$ = this.fieldTypeService.getFieldTypes();
   }
 
-  private initConstraints() {
-    this.constraintService.getConstraints().subscribe((res) => {
-      this.constraints = res.result;
-      this.addColumn();
-    });
-  }
-
   private initTablesByDbId() {
     this.tableService.getTablesByDbId(this.dbId).subscribe((res) => {
       this.dbTables = res.result;
+      this.addColumn();
     });
-  }
-
-  appendNewItem(item: Constraint): void {
-    this.columns.push(
-      new FormGroup({
-        status: new FormControl(item.value),
-        price: new FormControl(item.statusValue),
-      })
-    );
   }
 
   get columns(): FormArray {
@@ -106,6 +86,7 @@ export class CreateTableComponent implements OnInit {
   getTableColumnsName(index: number): string[] {
     const curTableName = this.columns
       .at(index)
+      .get('constraints')!
       .get('foreignTable')
       ?.get('tableName')?.value;
     return this.dbTables
@@ -129,12 +110,17 @@ export class CreateTableComponent implements OnInit {
         type: ['', [Validators.required]],
         value: null,
       }),
-      columnConstraints: this.formBuilder.array(
-        Object.keys(this.constraints).map((key) => false)
-      ),
-      foreignTable: this.formBuilder.group({
-        tableName: '',
-        columnName: '',
+      constraints: this.formBuilder.group({
+        notNull: false,
+        primaryKey: false,
+        identity: false,
+        autoIncrement: false,
+        unique: false,
+        foreignTable: this.formBuilder.group({
+          foreignKey: false,
+          tableName: '',
+          columnName: '',
+        }),
       }),
       defaultValue: '',
     });
@@ -149,18 +135,15 @@ export class CreateTableComponent implements OnInit {
 
   submit(): void {
     const newColumns = this.form.getRawValue().columns.map((c: any) => {
-      let t = c.columnConstraints
-        .map((v: any, i: number) => v && this.constraints[i])
-        .filter((v: any) => !!v);
       let ft;
-      if (t.find((e: Constraint) => e.value === 'FOREIGN KEY')) {
-        if (c.foreignTable.tableName === '') {
+      if (c.constraints.foreignTable.foreignKey) {
+        if (c.constraints.foreignTable.tableName === '') {
           this.messageService.openError([
             'Need to specify a foreign table name for column ' + c.name,
           ]);
           throw new Error('Need to specify a table name ' + c.name);
         }
-        if (c.foreignTable.columnName === '') {
+        if (c.constraints.foreignTable.columnName === '') {
           this.messageService.openError([
             'Need to specify a foreign column name for column ' + c.name,
           ]);
@@ -169,14 +152,13 @@ export class CreateTableComponent implements OnInit {
           );
         }
         const tableId = this.dbTables.find((t) => {
-          return t.name === c.foreignTable['tableName'];
+          return t.name === c.constraints.foreignTable['tableName'];
         })!.id;
-        ft = Object.assign({}, c.foreignTable, {
+        ft = Object.assign({}, c.constraints.foreignTable, {
           tableName: `table_${tableId}`,
         });
       }
       return Object.assign({}, c, {
-        columnConstraints: t,
         foreignTable: ft,
       });
     });

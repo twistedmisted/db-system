@@ -24,7 +24,7 @@ public class ColumnServiceImpl implements ColumnService {
     private final TableRepository tableRepository;
 
     @Override
-    public void addNewColumn(Long tableId, CrateTablePayload.Column column, String username) {
+    public void addNewColumn(Long tableId, ColumnDto column, String username) {
         if (tableRepository.userHasAccessToTable(tableId, username) != 1) {
             throw new WrongDataException("Can't add new column, something went wrong");
         }

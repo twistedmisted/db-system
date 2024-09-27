@@ -24,7 +24,7 @@ public class ExceptionController extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler({Exception.class})
     public ResponseEntity<Object> handle(Exception ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(createErrorResponse(ex.getMessage(), false), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler({DataAccessException.class})

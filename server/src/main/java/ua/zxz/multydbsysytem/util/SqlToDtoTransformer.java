@@ -1,13 +1,18 @@
 package ua.zxz.multydbsysytem.util;
 
-import ua.zxz.multydbsysytem.dto.table.*;
+import ua.zxz.multydbsysytem.dto.table.ColumnDto;
+import ua.zxz.multydbsysytem.dto.table.ColumnType;
+import ua.zxz.multydbsysytem.dto.table.ForeignTableDto;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 public class SqlToDtoTransformer {
+
+    private static final Predicate<String> ACTIVE_WHEN_YES = "YES"::equals;
+    private static final Predicate<String> ACTIVE_WHEN_NO = "NO"::equals;
 
     public static ColumnDto transformColumn(ResultSet r) throws SQLException {
         ColumnDto field = new ColumnDto();
@@ -16,13 +21,7 @@ public class SqlToDtoTransformer {
                 r.getString("DATA_TYPE"),
                 r.getString("CHARACTER_MAXIMUM_LENGTH")
         ));
-        field.setConstraints(parseConstraints(
-                r.getString("IS_NULLABLE"),
-                r.getString("AUTO_INCREMENT"),
-                r.getString("UNIQUE_COLUMN"),
-                r.getString("PRIMARY_KEY"),
-                r.getString("IS_IDENTITY")
-        ));
+        parseConstraints(field, r);
         field.setDefaultValue(r.getString("COLUMN_DEFAULT"));
         return field;
     }
@@ -35,18 +34,16 @@ public class SqlToDtoTransformer {
         return columnType;
     }
 
-    private static List<ColumnConstraint> parseConstraints(String isNullable,
-                                                           String autoIncrement,
-                                                           String uniqueColumn,
-                                                           String primaryKey,
-                                                           String isIdentity) {
-        List<ColumnConstraint> settings = new ArrayList<>();
-        settings.add(new ColumnConstraint(Constraints.NULLABLE, isNullable));
-        settings.add(new ColumnConstraint(Constraints.AUTO_INCREMENT, autoIncrement));
-        settings.add(new ColumnConstraint(Constraints.UNIQUE, uniqueColumn));
-        settings.add(new ColumnConstraint(Constraints.PRIMARY_KEY, primaryKey));
-        settings.add(new ColumnConstraint(Constraints.IDENTITY, isIdentity));
-        return settings;
+    private static void parseConstraints(ColumnDto field, ResultSet r) throws SQLException {
+        setConstraint(v -> field.getConstraints().setPrimaryKey(v), ACTIVE_WHEN_YES, r.getString("PRIMARY_KEY"));
+        setConstraint(v -> field.getConstraints().setIdentity(v), ACTIVE_WHEN_YES, r.getString("IS_IDENTITY"));
+        setConstraint(v -> field.getConstraints().setAutoIncrement(v), ACTIVE_WHEN_YES, r.getString("AUTO_INCREMENT"));
+        setConstraint(v -> field.getConstraints().setNotNull(v), ACTIVE_WHEN_NO, r.getString("IS_NULLABLE"));
+        setConstraint(v -> field.getConstraints().setUnique(v), ACTIVE_WHEN_YES, r.getString("UNIQUE_COLUMN"));
+    }
+
+    private static void setConstraint(Consumer<Boolean> constraintSetter, Predicate<String> isActive, String value) {
+        constraintSetter.accept(isActive.test(value));
     }
 
     public static ForeignTableDto transformForeignTable(ResultSet r) throws SQLException {
@@ -55,6 +52,7 @@ public class SqlToDtoTransformer {
         table.setColumnName(r.getString("REFERENCED_COLUMN_NAME"));
         table.setConstraintName(r.getString("REFERENCED_CONSTRAINT_NAME"));
         table.setTableColumn(r.getString("COLUMN_NAME"));
+        table.setForeignKey(true);
         return table;
     }
 }

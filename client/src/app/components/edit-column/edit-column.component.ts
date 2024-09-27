@@ -8,13 +8,10 @@ import {
   Validators,
 } from '@angular/forms';
 import { CommonModule, Location } from '@angular/common';
-import { ConstraintService } from '../../service/constraint.service';
 import { FieldTypeService } from '../../service/fieldtype.service';
 import { ColumnService } from '../../service/column.service';
-import { Constraint } from '../../models/constraint.model';
 import { BehaviorSubject, forkJoin } from 'rxjs';
 import { Column } from '../../models/column.model';
-import { table } from 'console';
 
 @Component({
   selector: 'app-edit-column',
@@ -26,13 +23,11 @@ import { table } from 'console';
 export class EditColumnComponent implements OnInit {
   form!: FormGroup;
   fieldTypes$ = new BehaviorSubject<string[]>([]);
-  constraints!: Constraint[];
   tableId!: string;
   columnName!: string;
   column!: Column;
 
   constructor(
-    private constraintService: ConstraintService,
     private fieldTypeService: FieldTypeService,
     private columnService: ColumnService,
     private activatedRoute: ActivatedRoute,
@@ -48,11 +43,9 @@ export class EditColumnComponent implements OnInit {
 
     forkJoin({
       column: this.initColumn(),
-      constraints: this.initConstraints(),
     }).subscribe({
       next: (res) => {
         this.column = res.column.result;
-        this.constraints = res.constraints.result;
         this.initForm();
       },
     });
@@ -60,10 +53,6 @@ export class EditColumnComponent implements OnInit {
 
   private initFieldTypes() {
     this.fieldTypes$ = this.fieldTypeService.getFieldTypes();
-  }
-
-  private initConstraints() {
-    return this.constraintService.getConstraints();
   }
 
   private initColumn() {
@@ -81,24 +70,11 @@ export class EditColumnComponent implements OnInit {
         ],
       ],
       columnType: this.formBuilder.group({
-        type: this.column.type.type,
-        value: this.column.type.value,
+        type: this.column.columnType.type,
+        value: this.column.columnType.value,
       }),
-      columnConstraints: this.formBuilder.array(
-        this.constraints.map((key) =>
-          this.column.constraints.find((c) => c.value === key.value)
-        )
-      ),
     });
   }
 
-  submit(): void {
-    const constraintsToSave = this.form.value.columnConstraints
-      .map((v: any, i: number) => v && this.constraints[i])
-      .filter((v: any) => !!v);
-
-    const valueToSave = Object.assign({}, this.form.value, {
-      columnConstraints: constraintsToSave,
-    });
-  }
+  submit(): void {}
 }
