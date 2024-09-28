@@ -25,7 +25,8 @@ public interface ColumnService {
         if (constraints.isPrimaryKey()) {
             sb.append(PRIMARY_KEY);
         }
-        if (column.getConstraints().getForeignTable().isForeignKey()) {
+        if (Objects.nonNull(column.getConstraints().getForeignTable())
+                && column.getConstraints().getForeignTable().isForeignKey()) {
             ForeignTableDto foreignTable = column.getConstraints().getForeignTable();
             sb.append(REFERENCES)
                     .append(foreignTable.getTableName())
