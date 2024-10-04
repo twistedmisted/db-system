@@ -32,4 +32,5 @@ This project is a web-based application for managing databases, tables, and prov
 3. Everything done
 
 Server address - `http://localhost:8080`
+
 Client address - `http://localhost:4200/`
