@@ -166,4 +166,9 @@ public class TableServiceImpl implements TableService {
         tableRepository.deleteById(tableId);
         jdbcTemplate.update("DROP TABLE table_" + tableEntity.getId() + ";");
     }
+
+    @Override
+    public boolean hasRights(Long tableId, String username) {
+        return tableRepository.existsByIdAndDbUserUsername(tableId, username);
+    }
 }

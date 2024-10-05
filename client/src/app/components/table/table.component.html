@@ -7,6 +7,9 @@
     <div class="card-header d-flex justify-content-between align-items-center">
       <h3 class="card-title">Table Information</h3>
       <div>
+        <a class="btn btn-success me-2" [routerLink]="['content']"
+          >View Content</a
+        >
         <button class="btn btn-primary me-2" [routerLink]="['edit']">
           Update Table Name
         </button>
@@ -64,12 +67,12 @@
                 {{ column.defaultValue }}
               </td>
               <td class="text-center align-middle">
-<!--                <button-->
-<!--                  class="btn btn-sm btn-warning me-2"-->
-<!--                  [routerLink]="['columns', column.name, 'edit']"-->
-<!--                >-->
-<!--                  Update-->
-<!--                </button>-->
+                <!--                <button-->
+                <!--                  class="btn btn-sm btn-warning me-2"-->
+                <!--                  [routerLink]="['columns', column.name, 'edit']"-->
+                <!--                >-->
+                <!--                  Update-->
+                <!--                </button>-->
                 <button
                   class="btn btn-sm btn-danger"
                   (click)="deleteColumnByName(column.name)"

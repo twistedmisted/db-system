@@ -1,0 +1,18 @@
+.table th,
+.table td {
+  min-width: 150px;
+  max-width: 150px;
+  white-space: wrap;
+}
+
+.table th.sticky-action,
+.table td.sticky-action {
+  position: sticky;
+  right: 0;
+  background-color: white;
+  z-index: 2;
+}
+
+.table th.sticky-action {
+  z-index: 3;
+}

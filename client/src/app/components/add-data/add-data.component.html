@@ -1,0 +1,33 @@
+<div class="container mt-5">
+  <div class="mb-3">
+    <button class="btn btn-secondary" onclick="history.back()">Back</button>
+  </div>
+
+  <app-error-block></app-error-block>
+
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Add Record</h3>
+    </div>
+    <div class="card-body">
+      <form *ngIf="form" [formGroup]="form" (ngSubmit)="submit()">
+        <div *ngFor="let column of columns" class="mb-3">
+          <label [for]="column.name" class="form-label">{{
+            column.name
+          }}</label>
+          <input
+            type="text"
+            class="form-control"
+            id="newColumnName"
+            [placeholder]="['Enter ' + column.name]"
+            [formControlName]="column.name"
+          />
+        </div>
+
+        <button type="submit" class="btn btn-primary" [disabled]="!form.valid">
+          Save
+        </button>
+      </form>
+    </div>
+  </div>
+</div>

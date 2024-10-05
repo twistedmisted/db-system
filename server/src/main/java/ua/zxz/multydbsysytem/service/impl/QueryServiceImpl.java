@@ -54,9 +54,8 @@ public class QueryServiceImpl implements QueryService {
     }
 
     @Override
-    public List<Object> getAll(long dbId, String tableName) {
-        TableEntity tableEntity = getTableEntity(dbId, tableName);
-        return jdbcTemplate.query("SELECT * FROM table_" + tableEntity.getId() + ";",
+    public List<Object> getAll(long tableId) {
+        return jdbcTemplate.query("SELECT * FROM table_" + tableId + ";",
                 rs -> {
                     List<Object> list = new ArrayList<>();
                     while (rs.next()) {
@@ -67,8 +66,13 @@ public class QueryServiceImpl implements QueryService {
     }
 
     @Override
-    public void save(long dbId, String tableName, Map<String, Object> object) {
+    public List<Object> getAll(long dbId, String tableName) {
         TableEntity tableEntity = getTableEntity(dbId, tableName);
+        return getAll(tableEntity.getId());
+    }
+
+    @Override
+    public void save(long tableId, Map<String, Object> object) {
         String columns = String.join(" = ?, ", object.keySet()) + " = ?";
         String parametersCount = String.join(",", Collections.nCopies(object.size(), "?"));
 //        KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -78,7 +82,7 @@ public class QueryServiceImpl implements QueryService {
         jdbcTemplate.update(
                 con -> {
                     PreparedStatement ps = con.prepareStatement(
-                            String.format("INSERT INTO table_" + tableEntity.getId() + " SET %s;", columns)
+                            String.format("INSERT INTO table_" + tableId + " SET %s;", columns)
 //                            Statement.RETURN_GENERATED_KEYS
                     );
                     int index = 1;
@@ -90,6 +94,12 @@ public class QueryServiceImpl implements QueryService {
                 }
 //                keyHolder
         );
+    }
+
+    @Override
+    public void save(long dbId, String tableName, Map<String, Object> object) {
+        TableEntity tableEntity = getTableEntity(dbId, tableName);
+        save(tableEntity.getId(), object);
     }
 
     @Override

@@ -7,12 +7,13 @@ import { DbComponent } from './components/db/db.component';
 import { CreateTableComponent } from './components/create-table/create-table.component';
 import { TableComponent } from './components/table/table.component';
 import { EditTableComponent } from './components/edit-table/edit-table.component';
-import { EditColumnComponent } from './components/edit-column/edit-column.component';
 import { AddColumnComponent } from './components/add-column/add-column.component';
 import { CreateDbComponent } from './components/create-db/create-db.component';
 import { DbListComponent } from './components/db-list/db-list.component';
 import { CreateDbTokenComponent } from './components/create-db-token/create-db-token.component';
 import { EditDbComponent } from './components/edit-db/edit-db.component';
+import { TableContentComponent } from './components/table-content/table-content.component';
+import { AddDataComponent } from './components/add-data/add-data.component';
 
 export const routes: Routes = [
   {
@@ -62,6 +63,14 @@ export const routes: Routes = [
       {
         path: 'dbs/:dbId/token/create',
         component: CreateDbTokenComponent,
+      },
+      {
+        path: 'dbs/:dbId/tables/:tableId/content',
+        component: TableContentComponent,
+      },
+      {
+        path: 'dbs/:dbId/tables/:tableId/content/add',
+        component: AddDataComponent,
       },
     ],
   },

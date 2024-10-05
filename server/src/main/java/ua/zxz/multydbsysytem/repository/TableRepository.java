@@ -24,4 +24,6 @@ public interface TableRepository extends CrudRepository<TableEntity, Long> {
 
     @Query("SELECT t.name FROM TableEntity t WHERE t.id = :id")
     String findNameById(Long id);
+
+    boolean existsByIdAndDbUserUsername(Long tableId, String username);
 }

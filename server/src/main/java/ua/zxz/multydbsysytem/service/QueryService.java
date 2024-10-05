@@ -10,7 +10,11 @@ public interface QueryService {
 
     List<Object> getByColumn(long dbId, String tableName, Condition request);
 
+    List<Object> getAll(long tableId);
+
     List<Object> getAll(long dbId, String tableName);
+
+    void save(long tableId, Map<String, Object> object);
 
     void save(long dbId, String tableName, Map<String, Object> object);
 

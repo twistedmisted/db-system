@@ -16,4 +16,6 @@ public interface TableService {
     void update(TableDto tableDto, String username);
 
     void deleteById(Long tableId, String username);
+
+    boolean hasRights(Long tableId, String username);
 }
