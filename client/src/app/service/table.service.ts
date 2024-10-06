@@ -13,6 +13,7 @@ export class TableService {
   constructor(private http: HttpClient) {}
 
   getTableById(tableId: string) {
+    console.log('Sending request ' + tableId);
     return this.http.get<TableResponse>(BASE_URL + `/tables/${tableId}`);
   }
 

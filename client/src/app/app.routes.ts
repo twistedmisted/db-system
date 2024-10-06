@@ -14,6 +14,7 @@ import { CreateDbTokenComponent } from './components/create-db-token/create-db-t
 import { EditDbComponent } from './components/edit-db/edit-db.component';
 import { TableContentComponent } from './components/table-content/table-content.component';
 import { AddDataComponent } from './components/add-data/add-data.component';
+import { EditDataComponent } from './components/edit-data/edit-data.component';
 
 export const routes: Routes = [
   {
@@ -71,6 +72,10 @@ export const routes: Routes = [
       {
         path: 'dbs/:dbId/tables/:tableId/content/add',
         component: AddDataComponent,
+      },
+      {
+        path: 'dbs/:dbId/tables/:tableId/content/edit',
+        component: EditDataComponent,
       },
     ],
   },

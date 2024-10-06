@@ -4,7 +4,7 @@
   </div>
 
   <div class="mb-3 text-end">
-    <a class="btn btn-success" [routerLink]="['add']">Create New Row</a>
+    <a class="btn btn-success" [routerLink]="['add']">Add New Record</a>
   </div>
 
   <div class="card">
@@ -16,16 +16,32 @@
         <table class="table table-bordered">
           <thead>
             <tr>
-              <th>Column 1</th>
+              <th *ngFor="let colName of columnsNames">{{ colName }}</th>
               <th class="text-center sticky-action">Actions</th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>Row 1 Data 2</td>
+            <tr *ngFor="let record of content">
+              <td *ngFor="let col of columnsNames">{{ record[col] }}</td>
               <td class="text-center align-middle sticky-action">
-                <button class="btn btn-sm btn-warning me-2">Update</button>
-                <button class="btn btn-sm btn-danger">Delete</button>
+                <button
+                  class="btn btn-sm btn-warning me-2"
+                  [disabled]="!allowedToChange"
+                  [routerLink]="['edit']"
+                  [state]="{
+                    pkName: primaryKeyColumnName,
+                    pkValue: record[primaryKeyColumnName]
+                  }"
+                >
+                  Update
+                </button>
+                <button
+                  class="btn btn-sm btn-danger"
+                  (click)="delete(record)"
+                  [disabled]="!allowedToChange"
+                >
+                  Delete
+                </button>
               </td>
             </tr>
           </tbody>

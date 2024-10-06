@@ -4,6 +4,7 @@ import ua.zxz.multydbsysytem.dto.table.TableDto;
 import ua.zxz.multydbsysytem.web.payload.table.CrateTablePayload;
 
 import java.util.List;
+import java.util.Map;
 
 public interface TableService {
 
@@ -18,4 +19,6 @@ public interface TableService {
     void deleteById(Long tableId, String username);
 
     boolean hasRights(Long tableId, String username);
+
+    Map<String, String> getConstraints(long tableId);
 }

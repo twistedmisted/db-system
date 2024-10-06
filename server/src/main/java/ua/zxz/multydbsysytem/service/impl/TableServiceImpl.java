@@ -35,6 +35,11 @@ public class TableServiceImpl implements TableService {
             FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
             WHERE CONSTRAINT_TYPE = 'FOREIGN KEY' AND table_name = ?;""";
 
+    private static final String GET_TABLE_CONSTRAINTS = """
+            SELECT COLUMN_NAME, CONSTRAINT_TYPE
+            FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+            WHERE CONSTRAINT_TYPE != 'UNIQUE' AND CONSTRAINT_TYPE != 'FOREIGN KEY' AND table_name = ?;""";
+
     private final JdbcTemplate jdbcTemplate;
     private final DbService dbService;
     private final TableRepository tableRepository;
@@ -170,5 +175,19 @@ public class TableServiceImpl implements TableService {
     @Override
     public boolean hasRights(Long tableId, String username) {
         return tableRepository.existsByIdAndDbUserUsername(tableId, username);
+    }
+
+    @Override
+    public Map<String, String> getConstraints(long tableId) {
+        return jdbcTemplate.query(
+                GET_TABLE_CONSTRAINTS,
+                r -> {
+                    Map<String, String> constraints = new HashMap<>();
+                    while (r.next()) {
+                        constraints.put(r.getString("CONSTRAINT_TYPE"), r.getString("COLUMN_NAME"));
+                    }
+                    return constraints;
+                },
+                "table_" + tableId);
     }
 }

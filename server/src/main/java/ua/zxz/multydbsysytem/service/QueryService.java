@@ -8,6 +8,8 @@ import java.util.Map;
 
 public interface QueryService {
 
+    List<Object> getByColumn(long tableId, Condition condition);
+
     List<Object> getByColumn(long dbId, String tableName, Condition request);
 
     List<Object> getAll(long tableId);
@@ -18,7 +20,11 @@ public interface QueryService {
 
     void save(long dbId, String tableName, Map<String, Object> object);
 
+    void update(long tableId, UpdateQueryRequest updateQueryRequest);
+
     void update(long dbId, String tableName, UpdateQueryRequest request);
+
+    void delete(long tableId, Map<String, Object> object);
 
     void delete(long dbId, String tableName, Condition condition);
 }

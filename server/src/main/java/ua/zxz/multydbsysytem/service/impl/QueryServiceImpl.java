@@ -8,6 +8,7 @@ import ua.zxz.multydbsysytem.entity.TableEntity;
 import ua.zxz.multydbsysytem.exception.WrongDataException;
 import ua.zxz.multydbsysytem.repository.TableRepository;
 import ua.zxz.multydbsysytem.service.QueryService;
+import ua.zxz.multydbsysytem.service.TableService;
 import ua.zxz.multydbsysytem.web.payload.query.Condition;
 import ua.zxz.multydbsysytem.web.payload.query.UpdateQueryRequest;
 
@@ -20,14 +21,14 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class QueryServiceImpl implements QueryService {
 
+    private final TableService tableService;
     private final TableRepository tableRepository;
     private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public List<Object> getByColumn(long dbId, String tableName, Condition request) {
-        TableEntity tableEntity = getTableEntity(dbId, tableName);
-        return jdbcTemplate.query("SELECT * FROM table_" + tableEntity.getId() +
-                        " WHERE " + request.getColumnName() + request.getOperator().toString() + "?;",
+    public List<Object> getByColumn(long tableId, Condition condition) {
+        return jdbcTemplate.query("SELECT * FROM table_" + tableId +
+                        " WHERE " + condition.getColumnName() + condition.getOperator().toString() + "?;",
                 rs -> {
                     List<Object> list = new ArrayList<>();
                     while (rs.next()) {
@@ -35,7 +36,13 @@ public class QueryServiceImpl implements QueryService {
                     }
                     return list;
                 },
-                request.getValue());
+                condition.getValue());
+    }
+
+    @Override
+    public List<Object> getByColumn(long dbId, String tableName, Condition request) {
+        TableEntity tableEntity = getTableEntity(dbId, tableName);
+        return getByColumn(tableEntity.getId(), request);
     }
 
     private TableEntity getTableEntity(long dbId, String tableName) {
@@ -103,15 +110,14 @@ public class QueryServiceImpl implements QueryService {
     }
 
     @Override
-    public void update(long dbId, String tableName, UpdateQueryRequest request) {
-        TableEntity tableEntity = getTableEntity(dbId, tableName);
+    public void update(long tableId, UpdateQueryRequest request) {
         Condition condition = request.getCondition();
         Map<String, Object> object = request.getObject();
         String columnsToUpdate = object.keySet().stream().map(c -> c + " = ?").collect(Collectors.joining(", "));
         jdbcTemplate.update(
                 con -> {
                     PreparedStatement ps = con.prepareStatement(
-                            "UPDATE table_" + tableEntity.getId() +
+                            "UPDATE table_" + tableId +
                                     " SET " + columnsToUpdate +
                                     " WHERE " + condition.getColumnName() + condition.getOperator().toString() + " ?;",
                             Statement.RETURN_GENERATED_KEYS
@@ -127,10 +133,33 @@ public class QueryServiceImpl implements QueryService {
     }
 
     @Override
+    public void update(long dbId, String tableName, UpdateQueryRequest request) {
+        TableEntity tableEntity = getTableEntity(dbId, tableName);
+        update(tableEntity.getId(), request);
+    }
+
+    @Override
+    public void delete(long tableId, Map<String, Object> object) {
+        Map<String, String> constraints = tableService.getConstraints(tableId);
+        if (constraints.isEmpty()) {
+            throw new WrongDataException("Can't delete data from table, something went wrong");
+        }
+        String columnRemoveBy = constraints.get("PRIMARY KEY");
+        Object value = object.get(columnRemoveBy);
+        if (Objects.isNull(columnRemoveBy) || Objects.isNull(value)) {
+            throw new WrongDataException("Can't delete data from table, something went wrong");
+        }
+        delete(tableId, new Condition(columnRemoveBy, Condition.Operator.EQUALS, value));
+    }
+
+    @Override
     public void delete(long dbId, String tableName, Condition condition) {
         TableEntity tableEntity = getTableEntity(dbId, tableName);
-        jdbcTemplate.update("DELETE FROM table_" +
-                tableEntity.getId() +
+        delete(tableEntity.getId(), condition);
+    }
+
+    private void delete(long tableId, Condition condition) {
+        jdbcTemplate.update("DELETE FROM table_" + tableId +
                 " WHERE " +
                 condition.getColumnName() +
                 condition.getOperator().toString() +

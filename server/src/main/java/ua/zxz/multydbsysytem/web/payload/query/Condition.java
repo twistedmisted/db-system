@@ -2,11 +2,14 @@ package ua.zxz.multydbsysytem.web.payload.query;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Data
+@NotNull
+@AllArgsConstructor
 public class Condition {
 
     @NotBlank(message = "Column name can't be blank")

@@ -55,22 +55,57 @@ export class AddDataComponent implements OnInit {
         );
         this.form = this.formBuilder.group({});
         this.columns.forEach((c) => {
+          let defVal = c.defaultValue ? c.defaultValue : null;
           if (c.constraints && c.constraints.notNull) {
             this.form.addControl(
               c.name,
-              new FormControl('', Validators.required)
+              new FormControl(defVal, Validators.required)
             );
           } else {
-            this.form.addControl(c.name, new FormControl(''));
+            this.form.addControl(c.name, new FormControl(defVal));
           }
         });
+        this.handleFormGroupCasting(this.form);
       }
     });
   }
 
-  allowedToInsertValue(c: Constraints): boolean {
-    return !(c.identity || c.autoIncrement);
+  private handleFormGroupCasting(formGroup: FormGroup): void {
+    Object.keys(formGroup.controls).forEach((controlName) => {
+      const control = formGroup.get(controlName);
+      control?.valueChanges.subscribe((value: string) => {
+        const transformedValue = this.castValue(value);
+        if (transformedValue !== value) {
+          control.setValue(transformedValue, { emitEvent: false });
+        }
+      });
+    });
+  }
 
+  private castValue(value: string): any {
+    if (value === undefined && value === null) {
+      return value;
+    }
+
+    if (value.toLowerCase() === 'true') {
+      return true;
+    } else if (value.toLowerCase() === 'false') {
+      return false;
+    }
+
+    if (!isNaN(parseInt(value, 10)) && Number.isInteger(parseFloat(value))) {
+      return parseInt(value, 10);
+    }
+
+    if (!isNaN(parseFloat(value))) {
+      return parseFloat(value);
+    }
+
+    return value;
+  }
+
+  private allowedToInsertValue(c: Constraints): boolean {
+    return !(c.identity || c.autoIncrement);
   }
 
   submit(): void {

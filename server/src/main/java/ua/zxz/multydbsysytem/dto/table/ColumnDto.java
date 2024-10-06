@@ -28,7 +28,7 @@ public class ColumnDto {
     @JsonIgnore
     public String getType() {
         return Objects.nonNull(type.getValue()) ?
-                type.getType() + "(" + type.getValue() + ")" :
-                type.getType().name();
+                type.getType().getSqlName() + "(" + type.getValue() + ")" :
+                type.getType().getSqlName();
     }
 }

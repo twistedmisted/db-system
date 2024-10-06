@@ -22,7 +22,7 @@ public class ColumnType {
         CHAR("CHAR"),
         VARCHAR("VARCHAR"),
         //        BLOB("BLOB"),
-        BOOLEAN("BOOLEAN"),
+        BOOLEAN("BIT"),
         DATETIME("DATETIME"),
         TIME("TIME"),
         TIMESTAMP("TIMESTAMP");

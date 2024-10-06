@@ -40,7 +40,6 @@ export class TableComponent implements OnInit {
     this.tableService
       .getTableById(this.activatedRoute.snapshot.paramMap.get('tableId')!)
       .subscribe((res) => {
-        console.log(res);
         this.table = res.result;
       });
   }
@@ -53,7 +52,6 @@ export class TableComponent implements OnInit {
     }
     if (constraintsObj.foreignTable && constraintsObj.foreignTable.foreignKey) {
       const foreignTable: ForeignTable = constraintsObj.foreignTable;
-      console.log('here con');
       constraints.push(
         `FOREIGN KEY REFERENCES ${foreignTable.tableName}(${foreignTable.columnName})`
       );

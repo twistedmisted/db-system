@@ -1,10 +1,13 @@
 package ua.zxz.multydbsysytem.web.controller;
 
+import org.springframework.beans.ConversionNotSupportedException;
+import org.springframework.beans.TypeMismatchException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -56,6 +59,11 @@ public class ExceptionController extends ResponseEntityExceptionHandler {
             return new ResponseEntity<>(createErrorResponse(field + ": " + message, true), HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(createErrorResponse("Arguments not valid", true), HttpStatus.BAD_REQUEST);
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        return super.handleHttpMessageNotReadable(ex, headers, status, request);
     }
 
     private ErrorResponse createErrorResponse(String message, boolean notification) {
