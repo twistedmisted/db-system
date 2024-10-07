@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import ua.zxz.multydbsysytem.dto.table.ColumnDto;
 import ua.zxz.multydbsysytem.service.ColumnService;
 import ua.zxz.multydbsysytem.web.payload.ColumnNamePayload;
+import ua.zxz.multydbsysytem.web.payload.RenameColumnPayload;
 
 import java.security.Principal;
 import java.util.Map;
@@ -37,6 +38,14 @@ public class ColumnController {
                                                Principal principal) {
         columnService.addNewColumn(tableId, column, principal.getName());
         return new ResponseEntity<>(Map.of("message", "Column successfully added"), OK);
+    }
+
+    @PutMapping("/rename")
+    public ResponseEntity<Object> renameColumn(@RequestParam Long tableId,
+                                               @RequestBody RenameColumnPayload request,
+                                               Principal principal) {
+        columnService.renameColumn(tableId, request, principal.getName());
+        return new ResponseEntity<>(Map.of("message", "Column successfully renamed"), OK);
     }
 
     @PostMapping("/deleteColumn")

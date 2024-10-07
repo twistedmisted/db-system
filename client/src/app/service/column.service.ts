@@ -26,6 +26,12 @@ export class ColumnService {
     );
   }
 
+  rename(tableId: string, data: any) {
+    return this.http.put<MessageResponse>(BASE_URL + `/columns/rename`, data, {
+      params: { tableId: tableId },
+    });
+  }
+
   delete(tableId: number, columnName: string) {
     return this.http.post<MessageResponse>(
       BASE_URL + `/columns/deleteColumn`,

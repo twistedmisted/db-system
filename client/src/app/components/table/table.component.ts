@@ -21,7 +21,11 @@ import { ForeignTable } from '../../models/foreigntable.model';
 export class TableComponent implements OnInit {
   table!: Table;
   constraints!: string;
-  dbId!: string;
+
+  private dbId: string;
+  private tableId: string;
+
+  private oldVal: any = null;
 
   constructor(
     private tableService: TableService,
@@ -29,19 +33,19 @@ export class TableComponent implements OnInit {
     private messageService: MessageService,
     private activatedRoute: ActivatedRoute,
     private router: Router
-  ) {}
+  ) {
+    this.dbId = this.activatedRoute.snapshot.paramMap.get('dbId')!;
+    this.tableId = this.activatedRoute.snapshot.paramMap.get('tableId')!;
+  }
 
   ngOnInit(): void {
-    this.dbId = this.activatedRoute.snapshot.paramMap.get('dbId')!;
     this.fetchTable();
   }
 
   fetchTable(): void {
-    this.tableService
-      .getTableById(this.activatedRoute.snapshot.paramMap.get('tableId')!)
-      .subscribe((res) => {
-        this.table = res.result;
-      });
+    this.tableService.getTableById(this.tableId).subscribe((res) => {
+      this.table = res.result;
+    });
   }
 
   getConstraints(column: Column): string[] {
@@ -72,7 +76,7 @@ export class TableComponent implements OnInit {
   }
 
   deleteTableById(tableId: number) {
-    this.tableService.delete(tableId).subscribe((res) => {
+    this.tableService.delete(tableId).subscribe(() => {
       this.router.navigate(['/dbs', this.dbId]);
     });
   }
@@ -82,5 +86,45 @@ export class TableComponent implements OnInit {
       this.messageService.openSuccess(res.message);
       this.ngOnInit();
     });
+  }
+
+  showInput(id: string): void {
+    const element: HTMLInputElement = document.getElementById(
+      id
+    )! as HTMLInputElement;
+    element.readOnly = false;
+    element.classList.remove('form-control-plaintext');
+    element.classList.add('form-control');
+    if (this.oldVal === null) {
+      this.oldVal = element.value;
+    }
+  }
+
+  onEnter(id: string): void {
+    const element: HTMLInputElement = document.getElementById(
+      id
+    )! as HTMLInputElement;
+    this.columnService
+      .rename(this.tableId, {
+        oldName: this.oldVal,
+        newName: element.value,
+      })
+      .subscribe((res) => {
+        this.messageService.openSuccess(res.message);
+        this.oldVal = element.value;
+        element.blur();
+      });
+  }
+
+  lostFocus(id: string) {
+    console.log('lost focus');
+    const element: HTMLInputElement = document.getElementById(
+      id
+    )! as HTMLInputElement;
+    element.readOnly = true;
+    element.classList.remove('form-control');
+    element.classList.add('form-control-plaintext');
+    element.value = this.oldVal;
+    this.oldVal = null;
   }
 }

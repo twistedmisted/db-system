@@ -3,6 +3,7 @@ package ua.zxz.multydbsysytem.service;
 import ua.zxz.multydbsysytem.dto.table.ColumnDto;
 import ua.zxz.multydbsysytem.dto.table.Constraints;
 import ua.zxz.multydbsysytem.dto.table.ForeignTableDto;
+import ua.zxz.multydbsysytem.web.payload.RenameColumnPayload;
 
 import java.util.Objects;
 
@@ -54,4 +55,6 @@ public interface ColumnService {
     }
 
     ColumnDto getColumnByName(Long tableId, String columnName, String username);
+
+    void renameColumn(Long tableId, RenameColumnPayload request, String username);
 }

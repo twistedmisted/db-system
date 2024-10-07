@@ -47,7 +47,17 @@
               *ngFor="let column of table.columns; let i = index"
               class="w-100"
             >
-              <th class="text-center align-middle">{{ column.name }}</th>
+              <th class="text-center align-middle">
+                <input
+                  [id]="['name_' + i]"
+                  [value]="column.name"
+                  class="form-control-plaintext text-center"
+                  (click)="showInput('name_' + i)"
+                  (keyup.enter)="onEnter('name_' + i)"
+                  (blur)="lostFocus('name_' + i)"
+                  readonly
+                />
+              </th>
               <td class="text-center align-middle">
                 {{
                   column.columnType.type +

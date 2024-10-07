@@ -9,7 +9,7 @@ import ua.zxz.multydbsysytem.exception.WrongDataException;
 import ua.zxz.multydbsysytem.repository.TableRepository;
 import ua.zxz.multydbsysytem.service.ColumnService;
 import ua.zxz.multydbsysytem.util.SqlToDtoTransformer;
-import ua.zxz.multydbsysytem.web.payload.table.CrateTablePayload;
+import ua.zxz.multydbsysytem.web.payload.RenameColumnPayload;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +34,7 @@ public class ColumnServiceImpl implements ColumnService {
     @Override
     public void deleteColumn(Long tableId, String columnName, String username) {
         if (tableRepository.userHasAccessToTable(tableId, username) != 1) {
-            throw new WrongDataException("Can't add new column, something went wrong");
+            throw new WrongDataException("Can't delete column, something went wrong");
         }
         jdbcTemplate.update("ALTER TABLE table_" + tableId + " DROP COLUMN " + columnName + " CASCADE;");
     }
@@ -50,6 +50,15 @@ public class ColumnServiceImpl implements ColumnService {
                 r -> r.next() ? SqlToDtoTransformer.transformColumn(r) : null,
                 "table_" + tableEntity.getId(), columnName
         );
+    }
+
+    @Override
+    public void renameColumn(Long tableId, RenameColumnPayload request, String username) {
+        if (tableRepository.userHasAccessToTable(tableId, username) != 1) {
+            throw new WrongDataException("Can't rename column, something went wrong");
+        }
+        jdbcTemplate.update("ALTER TABLE table_" + tableId +
+                " ALTER COLUMN " + request.getOldName() + " RENAME " + request.getNewName());
     }
 
     private TableEntity getTableById(Long id) {
