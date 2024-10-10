@@ -1,0 +1,18 @@
+<ul *ngIf="constraints.length > 0">
+  <li *ngFor="let constraint of constraints">
+    <div class="d-flex justify-content-between">
+      {{ constraint }}
+      <button
+        class="btn btn-white btn-xs"
+        (click)="deleteConstraint(constraint)"
+      >
+        <i class="bi bi-trash-fill black-color"></i>
+      </button>
+    </div>
+  </li>
+</ul>
+<div class="text-center align-middle">
+  <button class="btn btn-white btn-xs">
+    <i class="bi bi-plus-circle black-color"></i>
+  </button>
+</div>

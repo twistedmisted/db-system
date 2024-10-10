@@ -59,19 +59,23 @@
                 />
               </th>
               <td class="text-center align-middle">
-                {{
-                  column.columnType.type +
-                    (column.columnType.value
-                      ? "(" + column.columnType.value + ")"
-                      : "")
-                }}
+                <div formGroupName="columnType">
+                  <app-column-types
+                    [options]="fieldTypes$.getValue()"
+                    [column]="column"
+                    [index]="i"
+                    [tableId]="tableId"
+                    [columnName]="column.name"
+                  ></app-column-types>
+                </div>
               </td>
-              <td>
-                <ul>
-                  <li *ngFor="let constraint of getConstraints(column)">
-                    {{ constraint }}
-                  </li>
-                </ul>
+              <td class="align-middle">
+                <app-constraint-list
+                  [constraints]="getConstraints(column)"
+                  [columnName]="column.name"
+                  [tableId]="tableId"
+                  (deleteConstraintEvent)="deleteConstraint($event)"
+                ></app-constraint-list>
               </td>
               <td class="text-center align-middle">
                 {{ column.defaultValue }}

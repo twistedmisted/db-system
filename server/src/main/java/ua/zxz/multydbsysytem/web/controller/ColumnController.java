@@ -8,6 +8,8 @@ import ua.zxz.multydbsysytem.dto.table.ColumnDto;
 import ua.zxz.multydbsysytem.service.ColumnService;
 import ua.zxz.multydbsysytem.web.payload.ColumnNamePayload;
 import ua.zxz.multydbsysytem.web.payload.RenameColumnPayload;
+import ua.zxz.multydbsysytem.web.payload.column.ModifyDataType;
+import ua.zxz.multydbsysytem.web.payload.column.constraint.DeleteConstraint;
 
 import java.security.Principal;
 import java.util.Map;
@@ -48,11 +50,27 @@ public class ColumnController {
         return new ResponseEntity<>(Map.of("message", "Column successfully renamed"), OK);
     }
 
+    @PutMapping("/modifyType")
+    public ResponseEntity<Object> changeType(@RequestParam Long tableId,
+                                             @RequestBody ModifyDataType modifyDataType,
+                                             Principal principal) {
+        columnService.modifyColumnType(tableId, modifyDataType, principal.getName());
+        return new ResponseEntity<>(Map.of("message", "Column successfully changed"), OK);
+    }
+
     @PostMapping("/deleteColumn")
     public ResponseEntity<Object> deleteColumn(@RequestParam Long tableId,
                                                @RequestBody ColumnNamePayload columnNamePayload,
                                                Principal principal) {
         columnService.deleteColumn(tableId, columnNamePayload.getName(), principal.getName());
         return new ResponseEntity<>(Map.of("message", "Column successfully removed"), OK);
+    }
+
+    @PostMapping("/deleteConstraint")
+    public ResponseEntity<Object> deleteConstraint(@RequestParam Long tableId,
+                                                   @RequestBody DeleteConstraint request,
+                                                   Principal principal) {
+        columnService.deleteConstraint(tableId, request, principal.getName());
+        return new ResponseEntity<>(Map.of("message", "Column constraint successfully deleted"), OK);
     }
 }

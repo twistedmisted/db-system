@@ -10,6 +10,8 @@ import ua.zxz.multydbsysytem.repository.TableRepository;
 import ua.zxz.multydbsysytem.service.ColumnService;
 import ua.zxz.multydbsysytem.util.SqlToDtoTransformer;
 import ua.zxz.multydbsysytem.web.payload.RenameColumnPayload;
+import ua.zxz.multydbsysytem.web.payload.column.ModifyDataType;
+import ua.zxz.multydbsysytem.web.payload.column.constraint.DeleteConstraint;
 
 @Service
 @RequiredArgsConstructor
@@ -59,6 +61,29 @@ public class ColumnServiceImpl implements ColumnService {
         }
         jdbcTemplate.update("ALTER TABLE table_" + tableId +
                 " ALTER COLUMN " + request.getOldName() + " RENAME " + request.getNewName());
+    }
+
+    @Override
+    public void modifyColumnType(Long tableId, ModifyDataType request, String username) {
+        if (tableRepository.userHasAccessToTable(tableId, username) != 1) {
+            throw new WrongDataException("Can't modify column, something went wrong");
+        }
+        jdbcTemplate.update("ALTER TABLE table_" + tableId +
+                " MODIFY " + request.getColumnName() + " " + request.getColumnType());
+    }
+
+    @Override
+    public void deleteConstraint(Long tableId, DeleteConstraint request, String username) {
+        if (tableRepository.userHasAccessToTable(tableId, username) != 1) {
+            throw new WrongDataException("Can't delete column constraint, something went wrong");
+        }
+        switch (request.getConstraint()) {
+            case NOT_NULL:
+                jdbcTemplate.update("ALTER TABLE table_" + tableId + " MODIFY " + request.getColumnName() + " NULL");
+                return;
+            default:
+                throw new WrongDataException("Can't delete column constraint, something went wrong");
+        }
     }
 
     private TableEntity getTableById(Long id) {

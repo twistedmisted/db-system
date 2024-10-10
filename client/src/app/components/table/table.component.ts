@@ -10,20 +10,32 @@ import { ErrorBlockComponent } from '../error-block/error-block.component';
 import { Column } from '../../models/column.model';
 import { Constraints } from '../../models/constraints.model';
 import { ForeignTable } from '../../models/foreigntable.model';
+import { FieldTypeService } from '../../service/fieldtype.service';
+import { BehaviorSubject } from 'rxjs';
+import { ColumnTypesComponent } from '../column-types/column-types.component';
+import { ConstraintListComponent } from '../constraint-list/constraint-list.component';
 
 @Component({
   selector: 'app-table',
   standalone: true,
-  imports: [CommonModule, RouterModule, ApiInfoComponent, ErrorBlockComponent],
+  imports: [
+    CommonModule,
+    RouterModule,
+    ApiInfoComponent,
+    ErrorBlockComponent,
+    ColumnTypesComponent,
+    ConstraintListComponent,
+  ],
   templateUrl: './table.component.html',
   styleUrl: './table.component.scss',
 })
 export class TableComponent implements OnInit {
   table!: Table;
   constraints!: string;
+  fieldTypes$ = new BehaviorSubject<string[]>([]);
 
   private dbId: string;
-  private tableId: string;
+  tableId: string;
 
   private oldVal: any = null;
 
@@ -31,6 +43,7 @@ export class TableComponent implements OnInit {
     private tableService: TableService,
     private columnService: ColumnService,
     private messageService: MessageService,
+    private columnTypeService: FieldTypeService,
     private activatedRoute: ActivatedRoute,
     private router: Router
   ) {
@@ -40,12 +53,17 @@ export class TableComponent implements OnInit {
 
   ngOnInit(): void {
     this.fetchTable();
+    this.initFieldTypes();
   }
 
   fetchTable(): void {
     this.tableService.getTableById(this.tableId).subscribe((res) => {
       this.table = res.result;
     });
+  }
+
+  private initFieldTypes() {
+    this.fieldTypes$ = this.columnTypeService.getFieldTypes();
   }
 
   getConstraints(column: Column): string[] {
@@ -126,5 +144,13 @@ export class TableComponent implements OnInit {
     element.classList.add('form-control-plaintext');
     element.value = this.oldVal;
     this.oldVal = null;
+  }
+
+  deleteConstraint(data: any) {
+    console.log(data);
+    this.columnService.deleteConstraint(this.tableId, data).subscribe((res) => {
+      this.messageService.openSuccess(res.message);
+      this.ngOnInit();
+    });
   }
 }

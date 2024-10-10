@@ -1,0 +1,32 @@
+<div class="form-group position-relative">
+  <input
+    [id]="columnTypeId"
+    type="text"
+    class="form-control-plaintext text-center"
+    (click)="showInput()"
+    (keyup.enter)="onEnter()"
+    (focus)="showDropdown = true"
+    (blur)="lostFocus()"
+    (input)="filterOptions()"
+    placeholder="Select or type..."
+    aria-haspopup="true"
+    aria-expanded="showDropdown"
+    [value]="
+      column.columnType.type +
+      (column.columnType.value ? '(' + column.columnType.value + ')' : '')
+    "
+    readonly
+  />
+
+  <ul
+    class="dropdown-menu w-100"
+    [class.show]="showDropdown && filteredOptions.length > 0"
+    style="max-height: 200px; overflow-y: auto"
+  >
+    <li *ngFor="let option of filteredOptions">
+      <a class="dropdown-item" (mousedown)="selectOption(option)">{{
+        option
+      }}</a>
+    </li>
+  </ul>
+</div>
