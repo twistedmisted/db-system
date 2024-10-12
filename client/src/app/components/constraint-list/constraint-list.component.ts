@@ -1,12 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { ColumnService } from '../../service/column.service';
-import { MessageService } from '../../service/message.service';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-constraint-list',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './constraint-list.component.html',
   styleUrl: './constraint-list.component.scss',
 })

@@ -5,6 +5,8 @@ import ua.zxz.multydbsysytem.dto.table.Constraints;
 import ua.zxz.multydbsysytem.dto.table.ForeignTableDto;
 import ua.zxz.multydbsysytem.web.payload.RenameColumnPayload;
 import ua.zxz.multydbsysytem.web.payload.column.ModifyDataType;
+import ua.zxz.multydbsysytem.web.payload.column.ModifyDefVal;
+import ua.zxz.multydbsysytem.web.payload.column.constraint.AddConstraintsReq;
 import ua.zxz.multydbsysytem.web.payload.column.constraint.DeleteConstraint;
 
 import java.util.Objects;
@@ -12,11 +14,12 @@ import java.util.Objects;
 public interface ColumnService {
 
     String PRIMARY_KEY = "PRIMARY KEY";
+    String FOREIGN_KEY = "FOREIGN KEY";
+    String REFERENCES = "REFERENCES";
+    String UNIQUE = "UNIQUE";
     String IDENTITY = "IDENTITY";
     String AUTO_INCREMENT = "AUTO_INCREMENT";
-    String REFERENCES = "REFERENCES";
     String NOT_NULL = "NOT NULL";
-    String UNIQUE = "UNIQUE";
 
     void addNewColumn(Long tableId, ColumnDto column, String username);
 
@@ -62,5 +65,9 @@ public interface ColumnService {
 
     void modifyColumnType(Long tableId, ModifyDataType request, String username);
 
+    void addConstraints(Long tableId, AddConstraintsReq req, String username);
+
     void deleteConstraint(Long tableId, DeleteConstraint request, String username);
+
+    void modifyDefVal(Long tableId, ModifyDefVal req, String username);
 }

@@ -15,6 +15,7 @@ import { EditDbComponent } from './components/edit-db/edit-db.component';
 import { TableContentComponent } from './components/table-content/table-content.component';
 import { AddDataComponent } from './components/add-data/add-data.component';
 import { EditDataComponent } from './components/edit-data/edit-data.component';
+import { AddConstraintComponent } from './components/add-constraint/add-constraint.component';
 
 export const routes: Routes = [
   {
@@ -76,6 +77,10 @@ export const routes: Routes = [
       {
         path: 'dbs/:dbId/tables/:tableId/content/edit',
         component: EditDataComponent,
+      },
+      {
+        path: 'dbs/:dbId/tables/:tableId/addConstraint',
+        component: AddConstraintComponent,
       },
     ],
   },

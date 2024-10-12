@@ -1,0 +1,180 @@
+<div class="container mt-5 mb-5">
+  <div class="card">
+    <div class="card-body">
+      <ng-container *ngIf="selectedView === 'asElement'; else formTemp">
+        <ng-container>
+          <fieldset class="mb-3" *ngIf="form" [formGroup]="form">
+            <legend class="col-form-label pt-0">Constraints</legend>
+            <div class="form-check" formGroupName="constraints">
+              <div class="mb-1">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  formControlName="primaryKey"
+                />
+                <span class="form-check-label">PRIMARY KEY</span>
+              </div>
+              <div formGroupName="foreignTable">
+                <div class="mb-1">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    formControlName="foreignKey"
+                  />
+                  <span class="form-check-label">FOREIGN KEY</span>
+                </div>
+                <div class="d-flex mb-3">
+                  <select
+                    class="form-select"
+                    [value]="['change']"
+                    formControlName="tableName"
+                  >
+                    <option value="" disabled selected>Choose table</option>
+                    <option *ngFor="let table of dbTables" [value]="table.name">
+                      {{ table.name }}
+                    </option>
+                  </select>
+                  <select
+                    *ngIf="dbTables"
+                    class="form-select ms-3"
+                    [value]="['change']"
+                    formControlName="columnName"
+                  >
+                    <option value="" disabled selected>Choose column</option>
+                    <option
+                      *ngFor="let column of getTableColumnsName()"
+                      [value]="column"
+                    >
+                      {{ column }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+              <div class="mb-1">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  formControlName="identity"
+                />
+                <span class="form-check-label">IDENTITY</span>
+              </div>
+              <div class="mb-1">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  formControlName="autoIncrement"
+                />
+                <span class="form-check-label">AUTO INCREMENT</span>
+              </div>
+              <div class="mb-1">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  formControlName="notNull"
+                />
+                <span class="form-check-label">NOT NULL</span>
+              </div>
+              <div class="mb-1">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  formControlName="unique"
+                />
+                <span class="form-check-label">UNIQUE</span>
+              </div>
+            </div>
+          </fieldset>
+        </ng-container>
+      </ng-container>
+      <ng-template #formTemp>
+        <div class="mb-3">
+          <button class="btn btn-secondary" onclick="history.back()">
+            Back
+          </button>
+        </div>
+
+        <app-error-block></app-error-block>
+        <div *ngIf="!canAddConstraint()">Can't add any constraints</div>
+        <form
+          *ngIf="form && canAddConstraint()"
+          [formGroup]="form"
+          (ngSubmit)="submit()"
+        >
+          <fieldset class="mb-3">
+            <legend class="col-form-label pt-0">Constraints</legend>
+            <div class="form-check" formGroupName="constraints">
+              <div *ngIf="!columnConstraints.primaryKey" class="mb-1">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  formControlName="primaryKey"
+                />
+                <span class="form-check-label">PRIMARY KEY</span>
+              </div>
+              <div
+                *ngIf="
+                  (this.columnConstraints.foreignTable === undefined ||
+                    this.columnConstraints.foreignTable === null) &&
+                  !this.columnConstraints.primaryKey
+                "
+                formGroupName="foreignTable"
+              >
+                <div class="mb-1">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    formControlName="foreignKey"
+                  />
+                  <span class="form-check-label">FOREIGN KEY</span>
+                </div>
+                <div class="d-flex mb-3">
+                  <select
+                    class="form-select"
+                    [value]="['change']"
+                    formControlName="tableName"
+                  >
+                    <option value="" disabled selected>Choose table</option>
+                    <option *ngFor="let table of dbTables" [value]="table.name">
+                      {{ table.name }}
+                    </option>
+                  </select>
+                  <select
+                    *ngIf="dbTables"
+                    class="form-select ms-3"
+                    [value]="['change']"
+                    formControlName="columnName"
+                  >
+                    <option value="" disabled selected>Choose column</option>
+                    <option
+                      *ngFor="let column of getTableColumnsName()"
+                      [value]="column"
+                    >
+                      {{ column }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+              <div *ngIf="!columnConstraints.notNull" class="mb-1">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  formControlName="notNull"
+                />
+                <span class="form-check-label">NOT NULL</span>
+              </div>
+              <div *ngIf="!columnConstraints.unique" class="mb-1">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  formControlName="unique"
+                />
+                <span class="form-check-label">UNIQUE</span>
+              </div>
+            </div>
+          </fieldset>
+          <button type="submit" class="btn btn-primary">Add Constraints</button>
+        </form>
+      </ng-template>
+    </div>
+  </div>
+</div>

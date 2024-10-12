@@ -10,12 +10,12 @@ import {
 import { ActivatedRoute } from '@angular/router';
 import { FieldTypeService } from '../../service/fieldtype.service';
 import { BehaviorSubject } from 'rxjs';
-import { Constraint } from '../../models/constraint.model';
 import { ColumnService } from '../../service/column.service';
 import { MessageService } from '../../service/message.service';
 import { ErrorBlockComponent } from '../error-block/error-block.component';
 import { Table } from '../../models/table.model';
 import { TableService } from '../../service/table.service';
+import { AddConstraintComponent } from '../add-constraint/add-constraint.component';
 
 @Component({
   selector: 'app-add-column',
@@ -25,6 +25,7 @@ import { TableService } from '../../service/table.service';
     FormsModule,
     ReactiveFormsModule,
     ErrorBlockComponent,
+    AddConstraintComponent,
   ],
   templateUrl: './add-column.component.html',
   styleUrl: './add-column.component.scss',
@@ -96,15 +97,6 @@ export class AddColumnComponent implements OnInit {
     });
   }
 
-  getTableColumnsName(): string[] {
-    const curTableName = this.form.value.constraints.foreignTable.tableName;
-    return this.dbTables
-      .filter((t) => {
-        return t.name === curTableName;
-      })
-      .flatMap((t) => t.columns!.map((c) => c.name));
-  }
-
   submit(): void {
     let ft;
     if (this.form.getRawValue().constraints.foreignTable.foreignKey) {
@@ -135,11 +127,9 @@ export class AddColumnComponent implements OnInit {
       });
     }
 
-    console.log(ft);
     const constraintsToSave = Object.assign({}, this.form.value.constraints, {
       foreignTable: ft,
     });
-    console.log(constraintsToSave);
     const valueToSave = Object.assign({}, this.form.value, {
       constraints: constraintsToSave,
     });

@@ -2,6 +2,7 @@ package ua.zxz.multydbsysytem.util;
 
 import ua.zxz.multydbsysytem.dto.table.ColumnDto;
 import ua.zxz.multydbsysytem.dto.table.ColumnType;
+import ua.zxz.multydbsysytem.dto.table.Constraints;
 import ua.zxz.multydbsysytem.dto.table.ForeignTableDto;
 
 import java.sql.ResultSet;
@@ -11,8 +12,8 @@ import java.util.function.Predicate;
 
 public class SqlToDtoTransformer {
 
-    private static final Predicate<String> ACTIVE_WHEN_YES = "YES"::equals;
-    private static final Predicate<String> ACTIVE_WHEN_NO = "NO"::equals;
+    public static final Predicate<String> ACTIVE_WHEN_YES = "YES"::equals;
+    public static final Predicate<String> ACTIVE_WHEN_NO = "NO"::equals;
 
     public static ColumnDto transformColumn(ResultSet r) throws SQLException {
         ColumnDto field = new ColumnDto();
@@ -21,7 +22,7 @@ public class SqlToDtoTransformer {
                 r.getString("DATA_TYPE"),
                 r.getString("CHARACTER_MAXIMUM_LENGTH")
         ));
-        parseConstraints(field, r);
+        parseConstraints(field.getConstraints(), r);
         field.setDefaultValue(r.getString("COLUMN_DEFAULT"));
         return field;
     }
@@ -34,12 +35,12 @@ public class SqlToDtoTransformer {
         return columnType;
     }
 
-    private static void parseConstraints(ColumnDto field, ResultSet r) throws SQLException {
-        setConstraint(v -> field.getConstraints().setPrimaryKey(v), ACTIVE_WHEN_YES, r.getString("PRIMARY_KEY"));
-        setConstraint(v -> field.getConstraints().setIdentity(v), ACTIVE_WHEN_YES, r.getString("IS_IDENTITY"));
-        setConstraint(v -> field.getConstraints().setAutoIncrement(v), ACTIVE_WHEN_YES, r.getString("AUTO_INCREMENT"));
-        setConstraint(v -> field.getConstraints().setNotNull(v), ACTIVE_WHEN_NO, r.getString("IS_NULLABLE"));
-        setConstraint(v -> field.getConstraints().setUnique(v), ACTIVE_WHEN_YES, r.getString("UNIQUE_COLUMN"));
+    public static void parseConstraints(Constraints constraints, ResultSet r) throws SQLException {
+        setConstraint(constraints::setPrimaryKey, ACTIVE_WHEN_YES, r.getString("PRIMARY_KEY"));
+        setConstraint(constraints::setIdentity, ACTIVE_WHEN_YES, r.getString("IS_IDENTITY"));
+        setConstraint(constraints::setAutoIncrement, ACTIVE_WHEN_YES, r.getString("AUTO_INCREMENT"));
+        setConstraint(constraints::setNotNull, ACTIVE_WHEN_NO, r.getString("IS_NULLABLE"));
+        setConstraint(constraints::setUnique, ACTIVE_WHEN_YES, r.getString("UNIQUE_COLUMN"));
     }
 
     private static void setConstraint(Consumer<Boolean> constraintSetter, Predicate<String> isActive, String value) {

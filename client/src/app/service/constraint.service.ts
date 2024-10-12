@@ -1,17 +1,23 @@
-// import { HttpClient } from '@angular/common/http';
-// import { Injectable } from '@angular/core';
-// import { BehaviorSubject } from 'rxjs';
-// import { Constraint } from '../models/constraint.model';
-// import { ConstraintsResponse } from '../models/response/ConstraintsResponse';
-// import { BASE_URL } from '../constants';
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { BASE_URL } from '../constants';
+import { ColumnConstraintsResponse } from '../models/response/ColumnConstraintsResponse';
 
-// @Injectable({
-//   providedIn: 'root',
-// })
-// export class ConstraintService {
-//   constructor(private http: HttpClient) {}
+@Injectable({
+  providedIn: 'root',
+})
+export class ConstraintService {
+  constructor(private http: HttpClient) {}
 
-//   getConstraints() {
-//     return this.http.get<ConstraintsResponse>(BASE_URL + '/constraints');
-//   }
-// }
+  getConstraintsByTableAndColumn(tableId: string, columnName: string) {
+    return this.http.get<ColumnConstraintsResponse>(
+      BASE_URL + '/constraints/getByTableAndColumn',
+      {
+        params: {
+          tableId: tableId,
+          columnName: columnName,
+        },
+      }
+    );
+  }
+}

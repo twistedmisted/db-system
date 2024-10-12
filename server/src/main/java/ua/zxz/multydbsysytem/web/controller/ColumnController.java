@@ -9,6 +9,8 @@ import ua.zxz.multydbsysytem.service.ColumnService;
 import ua.zxz.multydbsysytem.web.payload.ColumnNamePayload;
 import ua.zxz.multydbsysytem.web.payload.RenameColumnPayload;
 import ua.zxz.multydbsysytem.web.payload.column.ModifyDataType;
+import ua.zxz.multydbsysytem.web.payload.column.ModifyDefVal;
+import ua.zxz.multydbsysytem.web.payload.column.constraint.AddConstraintsReq;
 import ua.zxz.multydbsysytem.web.payload.column.constraint.DeleteConstraint;
 
 import java.security.Principal;
@@ -58,12 +60,28 @@ public class ColumnController {
         return new ResponseEntity<>(Map.of("message", "Column successfully changed"), OK);
     }
 
+    @PutMapping("/modifyDefVal")
+    public ResponseEntity<Object> modifyDefVal(@RequestParam Long tableId,
+                                               @RequestBody ModifyDefVal req,
+                                               Principal principal) {
+        columnService.modifyDefVal(tableId, req, principal.getName());
+        return new ResponseEntity<>(Map.of("message", "Column default value successfully modified"), OK);
+    }
+
     @PostMapping("/deleteColumn")
     public ResponseEntity<Object> deleteColumn(@RequestParam Long tableId,
                                                @RequestBody ColumnNamePayload columnNamePayload,
                                                Principal principal) {
         columnService.deleteColumn(tableId, columnNamePayload.getName(), principal.getName());
         return new ResponseEntity<>(Map.of("message", "Column successfully removed"), OK);
+    }
+
+    @PostMapping("/addConstraints")
+    public ResponseEntity<Object> addConstraint(@RequestParam Long tableId,
+                                                @RequestBody AddConstraintsReq req,
+                                                Principal principal) {
+        columnService.addConstraints(tableId, req, principal.getName());
+        return new ResponseEntity<>(Map.of("message", "Constraints successfully added"), OK);
     }
 
     @PostMapping("/deleteConstraint")

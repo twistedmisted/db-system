@@ -3,7 +3,6 @@ import { Injectable } from '@angular/core';
 import { BASE_URL } from '../constants';
 import { ColumnResponse } from '../models/response/ColumnResponse';
 import { MessageResponse } from '../models/response/MessageResponse';
-import { table } from 'console';
 
 @Injectable({
   providedIn: 'root',
@@ -47,12 +46,36 @@ export class ColumnService {
     );
   }
 
+  modifyDefVal(tableId: string, data: any) {
+    return this.http.put<MessageResponse>(
+      BASE_URL + '/columns/modifyDefVal',
+      data,
+      {
+        params: {
+          tableId: tableId,
+        },
+      }
+    );
+  }
+
   delete(tableId: number, columnName: string) {
     return this.http.post<MessageResponse>(
       BASE_URL + `/columns/deleteColumn`,
       {
         name: columnName,
       },
+      {
+        params: {
+          tableId: tableId,
+        },
+      }
+    );
+  }
+
+  addConstraints(tableId: string, data: any) {
+    return this.http.post<MessageResponse>(
+      BASE_URL + `/columns/addConstraints`,
+      data,
       {
         params: {
           tableId: tableId,

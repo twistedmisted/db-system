@@ -55,87 +55,11 @@
           </div>
         </div>
 
-        <fieldset class="mb-3">
-          <legend class="col-form-label pt-0">Constraints</legend>
-          <div class="form-check" formGroupName="constraints">
-            <div class="mb-1">
-              <input
-                class="form-check-input"
-                type="checkbox"
-                formControlName="primaryKey"
-              />
-              <span class="form-check-label">PRIMARY KEY</span>
-            </div>
-            <div formGroupName="foreignTable">
-              <div class="mb-1">
-                <input
-                  class="form-check-input"
-                  type="checkbox"
-                  formControlName="foreignKey"
-                />
-                <span class="form-check-label">FOREIGN KEY</span>
-              </div>
-              <div class="d-flex mb-3">
-                <select
-                  class="form-select"
-                  [value]="['change']"
-                  formControlName="tableName"
-                >
-                  <option value="" disabled selected>Choose table</option>
-                  <option *ngFor="let table of dbTables" [value]="table.name">
-                    {{ table.name }}
-                  </option>
-                </select>
-                <select
-                  *ngIf="dbTables"
-                  class="form-select ms-3"
-                  [value]="['change']"
-                  formControlName="columnName"
-                >
-                  <option value="" disabled selected>Choose column</option>
-                  <option
-                    *ngFor="let column of getTableColumnsName()"
-                    [value]="column"
-                  >
-                    {{ column }}
-                  </option>
-                </select>
-              </div>
-            </div>
-            <div class="mb-1">
-              <input
-                class="form-check-input"
-                type="checkbox"
-                formControlName="identity"
-              />
-              <span class="form-check-label">IDENTITY</span>
-            </div>
-            <div class="mb-1">
-              <input
-                class="form-check-input"
-                type="checkbox"
-                formControlName="autoIncrement"
-              />
-              <span class="form-check-label">AUTO INCREMENT</span>
-            </div>
-            <div class="mb-1">
-              <input
-                class="form-check-input"
-                type="checkbox"
-                formControlName="notNull"
-              />
-              <span class="form-check-label">NOT NULL</span>
-            </div>
-            <div class="mb-1">
-              <input
-                class="form-check-input"
-                type="checkbox"
-                formControlName="unique"
-              />
-              <span class="form-check-label">UNIQUE</span>
-            </div>
-          </div>
-        </fieldset>
+        <app-add-constraint
+          [form]="form"
+          [dbTables]="dbTables"
+          [selectedView]="'asElement'"
+        ></app-add-constraint>
 
         <div class="mb-3">
           <label id="defaultValueLabel" for="valueField" class="form-label"

@@ -3,6 +3,7 @@
     <div class="d-flex justify-content-between">
       {{ constraint }}
       <button
+        *ngIf="constraint !== 'IDENTITY' && constraint !== 'AUTO INCREMENT'"
         class="btn btn-white btn-xs"
         (click)="deleteConstraint(constraint)"
       >
@@ -12,7 +13,11 @@
   </li>
 </ul>
 <div class="text-center align-middle">
-  <button class="btn btn-white btn-xs">
+  <a
+    class="btn btn-white btn-xs"
+    [routerLink]="['addConstraint']"
+    [state]="{ columnName: columnName }"
+  >
     <i class="bi bi-plus-circle black-color"></i>
-  </button>
+  </a>
 </div>

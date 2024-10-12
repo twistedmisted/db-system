@@ -53,13 +53,12 @@
                   [value]="column.name"
                   class="form-control-plaintext text-center"
                   (click)="showInput('name_' + i)"
-                  (keyup.enter)="onEnter('name_' + i)"
+                  (keyup.enter)="onEnterName('name_' + i)"
                   (blur)="lostFocus('name_' + i)"
                   readonly
                 />
               </th>
               <td class="text-center align-middle">
-                <div formGroupName="columnType">
                   <app-column-types
                     [options]="fieldTypes$.getValue()"
                     [column]="column"
@@ -67,7 +66,6 @@
                     [tableId]="tableId"
                     [columnName]="column.name"
                   ></app-column-types>
-                </div>
               </td>
               <td class="align-middle">
                 <app-constraint-list
@@ -78,15 +76,29 @@
                 ></app-constraint-list>
               </td>
               <td class="text-center align-middle">
-                {{ column.defaultValue }}
+                <ng-container
+                  *ngIf="allowToChangeDef(i); else changeValTemplate"
+                >
+                  <input
+                    [id]="'defVal_' + i"
+                    [value]="column.defaultValue"
+                    class="form-control-plaintext text-center"
+                    (click)="showInput('defVal_' + i)"
+                    (keyup.enter)="onEnterDefVal(i)"
+                    (blur)="lostFocus('defVal_' + i)"
+                    readonly
+                  />
+                </ng-container>
+                <ng-template #changeValTemplate>
+                  <ng-container
+                    *ngTemplateOutlet="
+                      changeVal;
+                      context: { $implicit: column }
+                    "
+                  ></ng-container>
+                </ng-template>
               </td>
               <td class="text-center align-middle">
-                <!--                <button-->
-                <!--                  class="btn btn-sm btn-warning me-2"-->
-                <!--                  [routerLink]="['columns', column.name, 'edit']"-->
-                <!--                >-->
-                <!--                  Update-->
-                <!--                </button>-->
                 <button
                   class="btn btn-sm btn-danger"
                   (click)="deleteColumnByName(column.name)"
@@ -102,3 +114,11 @@
     </div>
   </div>
 </div>
+
+<ng-template #changeVal let-column>
+  <input
+    [value]="column.defaultValue"
+    class="form-control-plaintext text-center"
+    readonly
+  />
+</ng-template>

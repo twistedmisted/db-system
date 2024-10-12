@@ -118,7 +118,7 @@ export class TableComponent implements OnInit {
     }
   }
 
-  onEnter(id: string): void {
+  onEnterName(id: string): void {
     const element: HTMLInputElement = document.getElementById(
       id
     )! as HTMLInputElement;
@@ -132,6 +132,27 @@ export class TableComponent implements OnInit {
         this.oldVal = element.value;
         element.blur();
       });
+  }
+
+  onEnterDefVal(index: number): void {
+    const element: HTMLInputElement = document.getElementById(
+      'defVal_' + index
+    )! as HTMLInputElement;
+    this.columnService
+      .modifyDefVal(this.tableId, {
+        columnName: this.table.columns![index].name,
+        defVal: element.value,
+      })
+      .subscribe((res) => {
+        this.messageService.openSuccess(res.message);
+        this.oldVal = element.value;
+        element.blur();
+      });
+  }
+
+  allowToChangeDef(index: number): boolean {
+    const constraints = this.table.columns![index].constraints;
+    return !constraints.primaryKey && !constraints.foreignTable;
   }
 
   lostFocus(id: string) {
