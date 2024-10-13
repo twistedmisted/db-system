@@ -119,20 +119,22 @@ export class AddColumnComponent implements OnInit {
             this.form.value.name
         );
       }
-      const tableId = this.dbTables.find((t) => {
-        return t.name === this.form.value.constraints.foreignTable['tableName'];
-      })!.id;
-      ft = Object.assign({}, this.form.value.constraints.foreignTable, {
-        tableName: `table_${tableId}`,
-      });
+      // const tableId = this.dbTables.find((t) => {
+      //   return t.name === this.form.value.constraints.foreignTable['tableName'];
+      // })!.id;
+      // ft = Object.assign({}, this.form.value.constraints.foreignTable, {
+      //   tableName: `table_${tableId}`,
+      // });
     }
 
-    const constraintsToSave = Object.assign({}, this.form.value.constraints, {
-      foreignTable: ft,
-    });
-    const valueToSave = Object.assign({}, this.form.value, {
-      constraints: constraintsToSave,
-    });
+    // const constraintsToSave = Object.assign({}, this.form.value.constraints, {
+    //   foreignTable: ft,
+    // });
+    // const valueToSave = Object.assign({}, this.form.value, {
+    //   constraints: constraintsToSave,
+    // });
+
+    const valueToSave = this.form.getRawValue();
 
     console.log(valueToSave);
 

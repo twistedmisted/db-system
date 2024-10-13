@@ -6,7 +6,7 @@ import {
   FormControl,
   FormGroup,
   FormsModule,
-  ReactiveFormsModule
+  ReactiveFormsModule,
 } from '@angular/forms';
 import { ErrorBlockComponent } from '../error-block/error-block.component';
 import { ConstraintService } from '../../service/constraint.service';
@@ -102,6 +102,7 @@ export class AddConstraintComponent implements OnInit {
 
   getTableColumnsName(): string[] {
     const curTableName = this.form.value.constraints.foreignTable.tableName;
+    console.log(this.dbTables);
     return this.dbTables
       .filter((t) => {
         return t.name === curTableName;
@@ -132,21 +133,20 @@ export class AddConstraintComponent implements OnInit {
           'Need to specify a foreign column name for column ' + this.columnName
         );
       }
-      const tableId = this.dbTables.find((t) => {
-        return t.name === this.form.value.constraints.foreignTable['tableName'];
-      })!.id;
-      ft = Object.assign({}, this.form.value.constraints.foreignTable, {
-        tableName: `table_${tableId}`,
-      });
+      // const tableId = this.dbTables.find((t) => {
+      //   return t.name === this.form.value.constraints.foreignTable['tableName'];
+      // })!.id;
+      // ft = Object.assign({}, this.form.value.constraints.foreignTable, {
+      //   tableName: `table_${tableId}`,
+      // });
     }
 
-    const constraintsToSave = Object.assign({}, this.form.value.constraints, {
-      foreignTable: ft,
-    });
+    // const constraintsToSave = Object.assign({}, this.form.value.constraints, {
+    //   foreignTable: ft,
+    // });
 
     const valueToSave = Object.assign({}, this.form.value, {
       columnName: this.columnName,
-      constraints: constraintsToSave,
     });
 
     this.columnService

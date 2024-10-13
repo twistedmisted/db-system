@@ -1,6 +1,7 @@
 package ua.zxz.multydbsysytem.service.security;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,9 +18,11 @@ import java.util.Collections;
 public class JwtUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
+    private final JdbcTemplate jdbcTemplate;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        jdbcTemplate.update("USE \"USER\";");
         final UserEntity user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User with username = [" + username + "] not found"));
         return new User(username, user.getPassword(), Collections.singleton(new SimpleGrantedAuthority("USER")));

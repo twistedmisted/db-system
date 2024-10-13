@@ -43,13 +43,16 @@ public class TableController {
         TableDto tableDto = new TableDto();
         tableDto.setId(tablePayload.getId());
         tableDto.setName(tablePayload.getName());
+        tableDto.setDbId(tablePayload.getDbId());
         tableService.update(tableDto, principal.getName());
         return new ResponseEntity<>(OK);
     }
 
     @DeleteMapping("/{tableId}")
-    public ResponseEntity<Object> deleteTable(@PathVariable final Long tableId, Principal principal) {
-        tableService.deleteById(tableId, principal.getName());
+    public ResponseEntity<Object> deleteTable(@PathVariable final Long tableId,
+                                              @RequestParam Long dbId,
+                                              Principal principal) {
+        tableService.deleteById(tableId, dbId, principal.getName());
         return new ResponseEntity<>(OK);
     }
 }

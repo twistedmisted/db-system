@@ -16,9 +16,9 @@ public interface TableService {
 
     void update(TableDto tableDto, String username);
 
-    void deleteById(Long tableId, String username);
+    void deleteById(Long tableId, Long dbId, String username);
 
     boolean hasRights(Long tableId, String username);
 
-    Map<String, String> getConstraints(long tableId);
+    Map<String, String> getConstraints(String tableName);
 }

@@ -94,7 +94,7 @@ export class TableComponent implements OnInit {
   }
 
   deleteTableById(tableId: number) {
-    this.tableService.delete(tableId).subscribe(() => {
+    this.tableService.delete(tableId, this.dbId).subscribe(() => {
       this.router.navigate(['/dbs', this.dbId]);
     });
   }
@@ -168,7 +168,6 @@ export class TableComponent implements OnInit {
   }
 
   deleteConstraint(data: any) {
-    console.log(data);
     this.columnService.deleteConstraint(this.tableId, data).subscribe((res) => {
       this.messageService.openSuccess(res.message);
       this.ngOnInit();

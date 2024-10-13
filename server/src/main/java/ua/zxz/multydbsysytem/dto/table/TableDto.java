@@ -9,6 +9,7 @@ import java.util.List;
 public class TableDto {
 
     private Long id;
+    private Long dbId;
     private String name;
     private List<ColumnDto> columns = new ArrayList<>();
 }

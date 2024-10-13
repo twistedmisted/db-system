@@ -26,8 +26,9 @@ public class QueryServiceImpl implements QueryService {
     private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public List<Object> getByColumn(long tableId, Condition condition) {
-        return jdbcTemplate.query("SELECT * FROM table_" + tableId +
+    public List<Object> getByColumn(TableEntity table, Condition condition) {
+        setNamespace("db_" + table.getDb().getId());
+        List<Object> result = jdbcTemplate.query("SELECT * FROM " + table.getName() +
                         " WHERE " + condition.getColumnName() + condition.getOperator().toString() + "?;",
                 rs -> {
                     List<Object> list = new ArrayList<>();
@@ -37,12 +38,14 @@ public class QueryServiceImpl implements QueryService {
                     return list;
                 },
                 condition.getValue());
+        setNamespace("\"USER\"");
+        return result;
     }
 
     @Override
     public List<Object> getByColumn(long dbId, String tableName, Condition request) {
         TableEntity tableEntity = getTableEntity(dbId, tableName);
-        return getByColumn(tableEntity.getId(), request);
+        return getByColumn(tableEntity, request);
     }
 
     private TableEntity getTableEntity(long dbId, String tableName) {
@@ -61,8 +64,9 @@ public class QueryServiceImpl implements QueryService {
     }
 
     @Override
-    public List<Object> getAll(long tableId) {
-        return jdbcTemplate.query("SELECT * FROM table_" + tableId + ";",
+    public List<Object> getAll(TableEntity table) {
+        setNamespace("db_" + table.getDb().getId());
+        List<Object> query = jdbcTemplate.query("SELECT * FROM " + table.getName() + ";",
                 rs -> {
                     List<Object> list = new ArrayList<>();
                     while (rs.next()) {
@@ -70,27 +74,28 @@ public class QueryServiceImpl implements QueryService {
                     }
                     return list;
                 });
+        setNamespace("\"USER\"");
+        return query;
+    }
+
+    private void setNamespace(String namespace) {
+        jdbcTemplate.update("USE " + namespace + ";");
     }
 
     @Override
     public List<Object> getAll(long dbId, String tableName) {
         TableEntity tableEntity = getTableEntity(dbId, tableName);
-        return getAll(tableEntity.getId());
+        return getAll(tableEntity);
     }
 
     @Override
-    public void save(long tableId, Map<String, Object> object) {
+    public void save(TableEntity table, Map<String, Object> object) {
+        setNamespace("db_" + table.getDb().getId());
         String columns = String.join(" = ?, ", object.keySet()) + " = ?";
-        String parametersCount = String.join(",", Collections.nCopies(object.size(), "?"));
-//        KeyHolder keyHolder = new GeneratedKeyHolder();
-//        return jdbcTemplate.update(
-//                String.format("INSERT INTO table_" + tableEntity.getId() + " (%s) VALUES (%s);", columns, parametersCount),
-//                object.values().toArray());
         jdbcTemplate.update(
                 con -> {
                     PreparedStatement ps = con.prepareStatement(
-                            String.format("INSERT INTO table_" + tableId + " SET %s;", columns)
-//                            Statement.RETURN_GENERATED_KEYS
+                            String.format("INSERT INTO " + table.getName() + " SET %s;", columns)
                     );
                     int index = 1;
                     for (Object v : object.values()) {
@@ -99,25 +104,26 @@ public class QueryServiceImpl implements QueryService {
                     }
                     return ps;
                 }
-//                keyHolder
         );
+        setNamespace("\"USER\"");
     }
 
     @Override
     public void save(long dbId, String tableName, Map<String, Object> object) {
         TableEntity tableEntity = getTableEntity(dbId, tableName);
-        save(tableEntity.getId(), object);
+        save(tableEntity, object);
     }
 
     @Override
-    public void update(long tableId, UpdateQueryRequest request) {
+    public void update(TableEntity table, UpdateQueryRequest request) {
+        setNamespace("db_" + table.getDb().getId());
         Condition condition = request.getCondition();
         Map<String, Object> object = request.getObject();
         String columnsToUpdate = object.keySet().stream().map(c -> c + " = ?").collect(Collectors.joining(", "));
         jdbcTemplate.update(
                 con -> {
                     PreparedStatement ps = con.prepareStatement(
-                            "UPDATE table_" + tableId +
+                            "UPDATE " + table.getName() +
                                     " SET " + columnsToUpdate +
                                     " WHERE " + condition.getColumnName() + condition.getOperator().toString() + " ?;",
                             Statement.RETURN_GENERATED_KEYS
@@ -130,17 +136,19 @@ public class QueryServiceImpl implements QueryService {
                     return ps;
                 }
         );
+        setNamespace("\"USER\"");
     }
 
     @Override
     public void update(long dbId, String tableName, UpdateQueryRequest request) {
         TableEntity tableEntity = getTableEntity(dbId, tableName);
-        update(tableEntity.getId(), request);
+        update(tableEntity, request);
     }
 
     @Override
-    public void delete(long tableId, Map<String, Object> object) {
-        Map<String, String> constraints = tableService.getConstraints(tableId);
+    public void delete(TableEntity table, Map<String, Object> object) {
+        setNamespace("db_" + table.getDb().getId());
+        Map<String, String> constraints = tableService.getConstraints(table.getName());
         if (constraints.isEmpty()) {
             throw new WrongDataException("Can't delete data from table, something went wrong");
         }
@@ -149,17 +157,18 @@ public class QueryServiceImpl implements QueryService {
         if (Objects.isNull(columnRemoveBy) || Objects.isNull(value)) {
             throw new WrongDataException("Can't delete data from table, something went wrong");
         }
-        delete(tableId, new Condition(columnRemoveBy, Condition.Operator.EQUALS, value));
+        delete(table.getName(), new Condition(columnRemoveBy, Condition.Operator.EQUALS, value));
+        setNamespace("\"USER\"");
     }
 
     @Override
     public void delete(long dbId, String tableName, Condition condition) {
         TableEntity tableEntity = getTableEntity(dbId, tableName);
-        delete(tableEntity.getId(), condition);
+        delete(tableEntity.getName(), condition);
     }
 
-    private void delete(long tableId, Condition condition) {
-        jdbcTemplate.update("DELETE FROM table_" + tableId +
+    private void delete(String tableName, Condition condition) {
+        jdbcTemplate.update("DELETE FROM " + tableName +
                 " WHERE " +
                 condition.getColumnName() +
                 condition.getOperator().toString() +

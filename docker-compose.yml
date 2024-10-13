@@ -11,6 +11,7 @@ services:
     environment:
       IRIS_USERNAME: _SYSTEM
       IRIS_PASSWORD: PASSWORD
+      IRIS_CONNECTION_LIMIT: 20
     healthcheck:
       test: iris terminal IRIS
       interval: 1s

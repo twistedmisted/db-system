@@ -11,7 +11,6 @@ import {
 import { Router } from '@angular/router';
 import { MessageService } from '../../service/message.service';
 import { AuthService } from '../../service/auth.service';
-import { catchError, EMPTY } from 'rxjs';
 
 @Component({
   selector: 'app-register',
@@ -79,8 +78,8 @@ export class RegisterComponent implements OnInit {
     return formControl.invalid && (formControl.dirty || formControl.touched);
   }
 
-  isRequired(formContol: FormControl): boolean {
-    return formContol.errors?.['required'];
+  isRequired(formControl: FormControl): boolean {
+    return formControl.errors?.['required'];
   }
 
   invMinLength(formControl: FormControl): boolean {

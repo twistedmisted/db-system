@@ -7,7 +7,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import ua.zxz.multydbsysytem.dto.UserDto;
 import ua.zxz.multydbsysytem.exception.WrongDataException;
@@ -33,7 +32,6 @@ import static org.springframework.http.MediaType.*;
 public class AuthController {
 
     private final UserService userService;
-    private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final RestorePasswordService restorePasswordService;
@@ -50,7 +48,7 @@ public class AuthController {
         userDto.setLastName(registrationRequest.getLastName());
         userDto.setUsername(registrationRequest.getUsername());
         userDto.setEmail(registrationRequest.getEmail());
-        userDto.setPassword(passwordEncoder.encode(registrationRequest.getPassword()));
+        userDto.setPassword(registrationRequest.getPassword());
         return userDto;
     }
 

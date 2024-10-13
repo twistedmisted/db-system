@@ -62,4 +62,8 @@ public class DbEntity {
         table.setDb(null);
         tables.remove(table);
     }
+
+    public String getTechName() {
+        return "db_" + this.id;
+    }
 }

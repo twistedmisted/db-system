@@ -10,6 +10,7 @@ import ua.zxz.multydbsysytem.entity.TableEntity;
 import ua.zxz.multydbsysytem.exception.WrongDataException;
 import ua.zxz.multydbsysytem.repository.TableRepository;
 import ua.zxz.multydbsysytem.service.ColumnService;
+import ua.zxz.multydbsysytem.service.DbService;
 import ua.zxz.multydbsysytem.util.SqlToDtoTransformer;
 import ua.zxz.multydbsysytem.web.payload.RenameColumnPayload;
 import ua.zxz.multydbsysytem.web.payload.column.ModifyDataType;
@@ -36,24 +37,35 @@ public class ColumnServiceImpl implements ColumnService {
             WHERE table_name = ? AND COLUMN_NAME = ? AND CONSTRAINT_TYPE = ?;""";
 
     private final JdbcTemplate jdbcTemplate;
+    private final JdbcService jdbcService;
+    private final DbService dbService;
     private final TableRepository tableRepository;
 
     @Override
     public void addNewColumn(Long tableId, ColumnDto column, String username) {
-        if (tableRepository.userHasAccessToTable(tableId, username) != 1) {
+        TableEntity tableEntity = getTableById(tableId);
+        if (!dbService.userHasRightsToDb(tableEntity.getDb().getId(), username)) {
             throw new WrongDataException("Can't add new column, something went wrong");
         }
-        jdbcTemplate.update("ALTER TABLE table_" + tableId + " ADD COLUMN " + ColumnService.mapToSqlColumn(column));
+        jdbcService.batchUpdate(
+                tableEntity.getDb().getId(),
+                "ALTER TABLE " + tableEntity.getName() + " ADD COLUMN " + ColumnService.mapToSqlColumn(column)
+        );
     }
 
     @Override
     public void deleteColumn(Long tableId, String columnName, String username) {
-        if (tableRepository.userHasAccessToTable(tableId, username) != 1) {
+        TableEntity tableEntity = getTableById(tableId);
+        if (!dbService.userHasRightsToDb(tableEntity.getDb().getId(), username)) {
             throw new WrongDataException("Can't delete column, something went wrong");
         }
-        jdbcTemplate.update("ALTER TABLE table_" + tableId + " DROP COLUMN " + columnName + " CASCADE;");
+        jdbcService.batchUpdate(
+                tableEntity.getDb().getId(),
+                "ALTER TABLE " + tableEntity.getName() + " DROP COLUMN " + columnName + " CASCADE;"
+        );
     }
 
+    @Deprecated
     @Override
     public ColumnDto getColumnByName(Long tableId, String columnName, String username) {
         TableEntity tableEntity = getTableById(tableId);
@@ -69,52 +81,62 @@ public class ColumnServiceImpl implements ColumnService {
 
     @Override
     public void renameColumn(Long tableId, RenameColumnPayload request, String username) {
-        if (tableRepository.userHasAccessToTable(tableId, username) != 1) {
+        TableEntity tableEntity = getTableById(tableId);
+        if (!dbService.userHasRightsToDb(tableEntity.getDb().getId(), username)) {
             throw new WrongDataException("Can't rename column, something went wrong");
         }
-        jdbcTemplate.update("ALTER TABLE table_" + tableId +
-                " ALTER COLUMN " + request.getOldName() + " RENAME " + request.getNewName());
+        jdbcService.batchUpdate(
+                tableEntity.getDb().getId(),
+                "ALTER TABLE " + tableEntity.getName() +
+                        " ALTER COLUMN " + request.getOldName() + " RENAME " + request.getNewName()
+        );
     }
 
     @Override
     public void modifyColumnType(Long tableId, ModifyDataType request, String username) {
-        if (tableRepository.userHasAccessToTable(tableId, username) != 1) {
-            throw new WrongDataException("Can't modify column, something went wrong");
+        TableEntity tableEntity = getTableById(tableId);
+        if (!dbService.userHasRightsToDb(tableEntity.getDb().getId(), username)) {
+            throw new WrongDataException("Can't modify column type, something went wrong");
         }
-        jdbcTemplate.update("ALTER TABLE table_" + tableId +
-                " MODIFY " + request.getColumnName() + " " + request.getColumnType());
+        jdbcService.batchUpdate(
+                tableEntity.getDb().getId(),
+                "ALTER TABLE " + tableEntity.getName() +
+                        " MODIFY " + request.getColumnName() + " " + request.getColumnType()
+        );
     }
 
     @Override
     public void addConstraints(Long tableId, AddConstraintsReq req, String username) {
-        if (tableRepository.userHasAccessToTable(tableId, username) != 1) {
-            throw new WrongDataException("Can't delete column constraint, something went wrong");
+        TableEntity tableEntity = getTableById(tableId);
+        if (!dbService.userHasRightsToDb(tableEntity.getDb().getId(), username)) {
+            throw new WrongDataException("Can't add column constraints, something went wrong");
         }
+        String tableName = tableEntity.getName();
         Constraints constraints = req.getConstraints();
         List<String> sqlQueries = new ArrayList<>();
         if (constraints.isNotNull()) {
-            sqlQueries.add("ALTER TABLE table_" + tableId + " MODIFY " + req.getColumnName() + " NOT NULL");
+            sqlQueries.add("ALTER TABLE " + tableName + " MODIFY " + req.getColumnName() + " NOT NULL;");
         }
         if (constraints.isPrimaryKey()) {
-            String constraintName = "pk_table_" + tableId + "_" + req.getColumnName();
-            sqlQueries.add("ALTER TABLE table_" + tableId +
+            String constraintName = "pk_" + tableName;
+            sqlQueries.add("ALTER TABLE " + tableName +
                     " ADD CONSTRAINT " + constraintName + " PRIMARY KEY (" + req.getColumnName() + ");");
         }
         if (constraints.isUnique()) {
-            String constraintName = "uq_table_" + tableId + "_" + req.getColumnName();
-            sqlQueries.add("ALTER TABLE table_" + tableId +
+            String constraintName = "uq_" + tableName + "_" + req.getColumnName();
+            sqlQueries.add("ALTER TABLE " + tableName +
                     " ADD CONSTRAINT " + constraintName + " UNIQUE (" + req.getColumnName() + ");");
         }
         if (Objects.nonNull(constraints.getForeignTable())
                 && constraints.getForeignTable().isForeignKey()) {
-            String constraintName = "fk_" + "table_" + tableId + "_" + req.getColumnName();
+            String constraintName = "fk_" + tableName + "_" + constraints.getForeignTable().getTableName();
             ForeignTableDto foreignTable = constraints.getForeignTable();
-            jdbcTemplate.update("ALTER TABLE table_" + tableId +
+            sqlQueries.add("ALTER TABLE " + tableName +
                     " ADD CONSTRAINT " + constraintName + " FOREIGN KEY (" + req.getColumnName() + ") REFERENCES " +
                     foreignTable.getTableName() + " (" + foreignTable.getColumnName() + ");");
         }
         if (!sqlQueries.isEmpty()) {
-            jdbcTemplate.batchUpdate(sqlQueries.toArray(new String[0]));
+            jdbcService.batchUpdate(tableEntity.getDb().getId(), sqlQueries);
         } else {
             throw new WrongDataException("Can't add column constraints, something went wrong");
         }
@@ -122,24 +144,32 @@ public class ColumnServiceImpl implements ColumnService {
 
     @Override
     public void deleteConstraint(Long tableId, DeleteConstraint request, String username) {
-        if (tableRepository.userHasAccessToTable(tableId, username) != 1) {
+        TableEntity tableEntity = getTableById(tableId);
+        if (!dbService.userHasRightsToDb(tableEntity.getDb().getId(), username)) {
             throw new WrongDataException("Can't delete column constraint, something went wrong");
         }
+        String tableName = tableEntity.getName();
         String constraint = request.getConstraint();
         if (NOT_NULL.equals(constraint)) {
-            jdbcTemplate.update("ALTER TABLE table_" + tableId + " MODIFY " + request.getColumnName() + " NULL");
+            jdbcTemplate.update("USE db_" + tableEntity.getDb().getId() + ";");
+            jdbcTemplate.update("ALTER TABLE " + tableName + " MODIFY " + request.getColumnName() + " NULL;");
+            jdbcTemplate.update("USE \"USER\";");
         } else if (UNIQUE.equals(constraint) || PRIMARY_KEY.equals(constraint)) {
+            jdbcTemplate.update("USE db_" + tableEntity.getDb().getId() + ";");
             String constraintName = jdbcTemplate.query(
                     GET_KEY_CONSTRAINT_NAME,
                     rs -> rs.next() ? rs.getString("CONSTRAINT_NAME") : null,
-                    "table_" + tableId, request.getColumnName(), constraint);
-            jdbcTemplate.update("ALTER TABLE table_" + tableId + " DROP CONSTRAINT " + constraintName);
+                    tableName, request.getColumnName(), constraint);
+            jdbcTemplate.update("ALTER TABLE " + tableName + " DROP CONSTRAINT " + constraintName + ";");
+            jdbcTemplate.update("USE \"USER\";");
         } else if (Objects.nonNull(constraint) && constraint.startsWith(FOREIGN_KEY)) {
+            jdbcTemplate.update("USE db_" + tableEntity.getDb().getId() + ";");
             String constraintName = jdbcTemplate.query(
                     GET_KEY_CONSTRAINT_NAME,
                     rs -> rs.next() ? rs.getString("CONSTRAINT_NAME") : null,
-                    "table_" + tableId, request.getColumnName(), FOREIGN_KEY);
-            jdbcTemplate.update("ALTER TABLE table_" + tableId + " DROP CONSTRAINT " + constraintName);
+                    tableName, request.getColumnName(), FOREIGN_KEY);
+            jdbcTemplate.update("ALTER TABLE " + tableName + " DROP CONSTRAINT " + constraintName + ";");
+            jdbcTemplate.update("USE \"USER\";");
         } else {
             throw new WrongDataException("Can't delete unsupported constraint");
         }
@@ -147,11 +177,12 @@ public class ColumnServiceImpl implements ColumnService {
 
     @Override
     public void modifyDefVal(Long tableId, ModifyDefVal req, String username) {
-        if (tableRepository.userHasAccessToTable(tableId, username) != 1) {
-            throw new WrongDataException("Can't delete column constraint, something went wrong");
+        TableEntity tableEntity = getTableById(tableId);
+        if (!dbService.userHasRightsToDb(tableEntity.getDb().getId(), username)) {
+            throw new WrongDataException("Can't change default column value, something went wrong");
         }
-        jdbcTemplate.update("ALTER TABLE table_" + tableId +
-                " MODIFY " + req.getColumnName() + " DEFAULT " + req.getDefVal());
+        jdbcService.batchUpdate(tableEntity.getDb().getId(), "ALTER TABLE " + tableEntity.getName() +
+                " MODIFY " + req.getColumnName() + " DEFAULT " + req.getDefVal() + ";");
     }
 
     private TableEntity getTableById(Long id) {

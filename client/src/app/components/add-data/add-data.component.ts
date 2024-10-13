@@ -55,7 +55,9 @@ export class AddDataComponent implements OnInit {
         );
         this.form = this.formBuilder.group({});
         this.columns.forEach((c) => {
-          let defVal = c.defaultValue ? c.defaultValue : null;
+          let defVal = c.defaultValue
+            ? c.defaultValue.replace(/['"]/g, '')
+            : null;
           if (c.constraints && c.constraints.notNull) {
             this.form.addControl(
               c.name,

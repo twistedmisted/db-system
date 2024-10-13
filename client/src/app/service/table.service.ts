@@ -29,7 +29,11 @@ export class TableService {
     return this.http.put(BASE_URL + '/tables', table);
   }
 
-  delete(tableId: number) {
-    return this.http.delete(BASE_URL + `/tables/${tableId}`);
+  delete(tableId: number, dbId: string) {
+    return this.http.delete(BASE_URL + `/tables/${tableId}`, {
+      params: {
+        dbId: dbId,
+      },
+    });
   }
 }

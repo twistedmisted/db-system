@@ -41,9 +41,11 @@ public class TableServiceImpl implements TableService {
             WHERE CONSTRAINT_TYPE != 'UNIQUE' AND CONSTRAINT_TYPE != 'FOREIGN KEY' AND table_name = ?;""";
 
     private final JdbcTemplate jdbcTemplate;
+    private final JdbcService jdbcService;
     private final DbService dbService;
     private final TableRepository tableRepository;
     private final DbRepository dbRepository;
+    private final DataSourceService dataSourceService;
 
     @Override
     public TableDto getTableById(Long id, String username) {
@@ -51,18 +53,26 @@ public class TableServiceImpl implements TableService {
         if (!dbService.userHasRightsToDb(tableEntity.getDb().getId(), username)) {
             throw new WrongDataException("Can't get the table");
         }
-        return getTableDto(tableEntity);
+        try {
+            jdbcTemplate.update("USE " + tableEntity.getDb().getTechName() + ";");
+            TableDto tableDto = getTableDto(tableEntity);
+            jdbcService.rollbackNamespace();
+            return tableDto;
+        } catch (Exception e) {
+            jdbcService.rollbackNamespace();
+            throw e;
+        }
     }
 
     private TableDto getTableDto(TableEntity tableEntity) {
-        Map<String, ColumnDto> columnsByName = getColumns(tableEntity);
-        List<ForeignTableDto> foreignTables = getForeignTables(tableEntity.getId());
+        Map<String, ColumnDto> columnsByName = getColumns(tableEntity.getName());
+        List<ForeignTableDto> foreignTables = getForeignTables(tableEntity.getName());
         if (!foreignTables.isEmpty() && !columnsByName.isEmpty()) {
             foreignTables.forEach(ft -> {
                 ColumnDto columnDto = columnsByName.get(ft.getTableColumn());
                 if (Objects.nonNull(columnDto)) {
-                    String techName = ft.getTableName();
-                    ft.setTableName(tableRepository.findNameById(Long.valueOf(techName.substring(techName.indexOf("_") + 1))));
+//                    String techName = ft.getTableName();
+//                    ft.setTableName(tableRepository.findNameById(Long.valueOf(techName.substring(techName.indexOf("_") + 1))));
                     columnDto.getConstraints().setForeignTable(ft);
                 }
             });
@@ -74,7 +84,7 @@ public class TableServiceImpl implements TableService {
         return tableDto;
     }
 
-    private List<ForeignTableDto> getForeignTables(Long tableId) {
+    private List<ForeignTableDto> getForeignTables(String tableName) {
         List<ForeignTableDto> tables = jdbcTemplate.query(
                 GET_KEY_COLUMN_USAGE,
                 r -> {
@@ -84,12 +94,12 @@ public class TableServiceImpl implements TableService {
                     }
                     return result;
                 },
-                "table_" + tableId
+                tableName
         );
         return Objects.isNull(tables) ? Collections.emptyList() : tables;
     }
 
-    private Map<String, ColumnDto> getColumns(TableEntity tableEntity) {
+    private Map<String, ColumnDto> getColumns(String tableName) {
         Map<String, ColumnDto> columns = jdbcTemplate.query(
                 GET_TABLE_INFORMATION_QUERY,
                 r -> {
@@ -100,7 +110,7 @@ public class TableServiceImpl implements TableService {
                     }
                     return result;
                 },
-                "table_" + tableEntity.getId());
+                tableName);
         return Objects.isNull(columns) ? Collections.emptyMap() : columns;
     }
 
@@ -116,10 +126,20 @@ public class TableServiceImpl implements TableService {
         }
         List<TableEntity> tables = tableRepository.findAllByDbId(dbId);
         List<TableDto> tableDtos = new ArrayList<>();
-        for (TableEntity table : tables) {
-            tableDtos.add(getTableDto(table));
+        if (tables.isEmpty()) {
+            return new ArrayList<>();
         }
-        return tableDtos;
+        try {
+            jdbcTemplate.update("USE " + tables.getFirst().getDb().getTechName() + ";");
+            for (TableEntity table : tables) {
+                tableDtos.add(getTableDto(table));
+            }
+            jdbcService.rollbackNamespace();
+            return tableDtos;
+        } catch (Exception e) {
+            jdbcService.rollbackNamespace();
+            throw e;
+        }
     }
 
     @Transactional
@@ -139,7 +159,7 @@ public class TableServiceImpl implements TableService {
     }
 
     private void createSqlTable(CrateTablePayload table, TableEntity tableEntity) {
-        String tableName = "table_" + tableEntity.getId();
+        String tableName = table.getName();
         String firstPart = "CREATE TABLE " + tableName + "(";
         StringBuilder tableCreationSql = new StringBuilder(firstPart);
         for (int i = 0; i < table.getColumns().size(); i++) {
@@ -148,28 +168,34 @@ public class TableServiceImpl implements TableService {
                 tableCreationSql.append(",");
             }
         }
-        tableCreationSql.append(")");
-        jdbcTemplate.update(tableCreationSql.toString());
+        tableCreationSql.append(");");
+        jdbcService.batchUpdate(tableEntity.getDb().getId(), tableCreationSql.toString());
     }
 
     @Override
+    @Transactional
     public void update(TableDto tableDto, String username) {
         TableEntity tableEntity = getTableById(tableDto.getId());
         if (!dbService.userHasRightsToDb(tableEntity.getDb().getId(), username)) {
             throw new WrongDataException("Can't update table, something went wrong");
         }
-        tableEntity.setName(tableDto.getName());
-        tableRepository.save(tableEntity);
+        String oldName = tableEntity.getName();
+        if (!oldName.equals(tableDto.getName())) {
+            tableEntity.setName(tableDto.getName());
+            tableRepository.save(tableEntity);
+            jdbcService.batchUpdate(tableDto.getDbId(), "ALTER TABLE " + oldName + " RENAME " + tableDto.getName() + ";");
+        }
     }
 
     @Override
-    public void deleteById(Long tableId, String username) {
+    @Transactional
+    public void deleteById(Long tableId, Long dbId, String username) {
         TableEntity tableEntity = getTableById(tableId);
         if (!dbService.userHasRightsToDb(tableEntity.getDb().getId(), username)) {
             throw new WrongDataException("Can't update table, something went wrong");
         }
         tableRepository.deleteById(tableId);
-        jdbcTemplate.update("DROP TABLE table_" + tableEntity.getId() + ";");
+        jdbcService.batchUpdate(dbId, "DROP TABLE " + tableEntity.getName() + ";");
     }
 
     @Override
@@ -178,7 +204,7 @@ public class TableServiceImpl implements TableService {
     }
 
     @Override
-    public Map<String, String> getConstraints(long tableId) {
+    public Map<String, String> getConstraints(String tableName) {
         return jdbcTemplate.query(
                 GET_TABLE_CONSTRAINTS,
                 r -> {
@@ -188,6 +214,6 @@ public class TableServiceImpl implements TableService {
                     }
                     return constraints;
                 },
-                "table_" + tableId);
+                tableName);
     }
 }

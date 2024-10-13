@@ -7,4 +7,5 @@ public class TableUpdateRequest {
 
     private Long id;
     private String name;
+    private Long dbId;
 }

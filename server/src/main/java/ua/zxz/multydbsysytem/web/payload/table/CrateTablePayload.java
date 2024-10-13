@@ -1,5 +1,6 @@
 package ua.zxz.multydbsysytem.web.payload.table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -21,4 +22,9 @@ public class CrateTablePayload {
 
     @NotNull(message = "The tables fields can't be null")
     private List<ColumnDto> columns;
+
+    @JsonIgnore
+    public String getDbTechName() {
+        return "id_" + dbId;
+    }
 }

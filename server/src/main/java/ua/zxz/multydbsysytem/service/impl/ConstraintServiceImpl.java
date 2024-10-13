@@ -5,6 +5,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import ua.zxz.multydbsysytem.dto.table.Constraints;
 import ua.zxz.multydbsysytem.dto.table.ForeignTableDto;
+import ua.zxz.multydbsysytem.entity.TableEntity;
 import ua.zxz.multydbsysytem.exception.WrongDataException;
 import ua.zxz.multydbsysytem.repository.TableRepository;
 import ua.zxz.multydbsysytem.service.ConstraintService;
@@ -31,16 +32,24 @@ public class ConstraintServiceImpl implements ConstraintService {
 
     @Override
     public Constraints getByTableId(Long tableId, String columnName, String username) {
-        if (tableRepository.userHasAccessToTable(tableId, username) != 1) {
+        TableEntity tableEntity = getTableById(tableId);
+        if (!tableEntity.getDb().getUser().getUsername().equals(username)) {
             throw new WrongDataException("Can't get constraints by table id " + tableId);
         }
         Constraints constraints = new Constraints();
-        getTableConstraints(tableId, columnName, constraints);
-        getForeignKeys(tableId, columnName, constraints);
+        jdbcTemplate.update("USE db_" + tableEntity.getDb().getId() + ";");
+        getTableConstraints(tableEntity.getName(), columnName, constraints);
+        getForeignKeys(tableEntity.getName(), columnName, constraints);
+        jdbcTemplate.update("USE \"USER\";");
         return constraints;
     }
 
-    private void getForeignKeys(Long tableId, String columnName, Constraints constraints) {
+    private TableEntity getTableById(Long id) {
+        return tableRepository.findById(id)
+                .orElseThrow(() -> new WrongDataException("Can't get the table"));
+    }
+
+    private void getForeignKeys(String tableName, String columnName, Constraints constraints) {
         jdbcTemplate.query(
                 GET_FOREIGN_KEYS,
                 r -> {
@@ -50,10 +59,10 @@ public class ConstraintServiceImpl implements ConstraintService {
                     }
                     return null;
                 },
-                "table_" + tableId, columnName);
+                tableName, columnName);
     }
 
-    private void getTableConstraints(Long tableId, String columnName, Constraints constraints) {
+    private void getTableConstraints(String tableName, String columnName, Constraints constraints) {
         jdbcTemplate.query(
                 GET_TABLE_CONSTRAINTS,
                 r -> {
@@ -62,6 +71,6 @@ public class ConstraintServiceImpl implements ConstraintService {
                     }
                     return null;
                 },
-                "table_" + tableId, columnName);
+                tableName, columnName);
     }
 }

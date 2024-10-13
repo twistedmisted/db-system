@@ -1,9 +1,11 @@
 package ua.zxz.multydbsysytem.service.impl;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 import ua.zxz.multydbsysytem.dto.UserDto;
 import ua.zxz.multydbsysytem.exception.WrongDataException;
 import ua.zxz.multydbsysytem.mapper.impl.UserMapper;
@@ -12,9 +14,6 @@ import ua.zxz.multydbsysytem.service.UserService;
 
 import java.util.Objects;
 
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -22,6 +21,8 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final JdbcTemplate jdbcTemplate;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public UserDto getById(long id) {
@@ -36,6 +37,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void saveUser(UserDto userDto) {
         if (existsByUsername(userDto.getUsername())) {
             log.info("The user with username = [{}] already exists", userDto.getUsername());
@@ -44,7 +46,11 @@ public class UserServiceImpl implements UserService {
             log.info("The user with email = [{}] already exists", userDto.getEmail());
             throw new WrongDataException("The user with such email already exists");
         }
+        String password = userDto.getPassword();
+        userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
         userRepository.save(userMapper.dtoToEntity(userDto));
+        jdbcTemplate.update("CREATE USER " + userDto.getUsername() +
+                " IDENTIFY BY '" + password + "'");
     }
 
     @Override

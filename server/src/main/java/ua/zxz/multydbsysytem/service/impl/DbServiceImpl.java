@@ -1,16 +1,15 @@
 package ua.zxz.multydbsysytem.service.impl;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 import ua.zxz.multydbsysytem.dto.DbDto;
 import ua.zxz.multydbsysytem.dto.PageDto;
 import ua.zxz.multydbsysytem.entity.DbEntity;
-import ua.zxz.multydbsysytem.entity.TableEntity;
 import ua.zxz.multydbsysytem.exception.WrongDataException;
 import ua.zxz.multydbsysytem.mapper.impl.DbMapper;
 import ua.zxz.multydbsysytem.repository.DbRepository;
@@ -18,9 +17,6 @@ import ua.zxz.multydbsysytem.service.DbService;
 import ua.zxz.multydbsysytem.service.DbTokenService;
 
 import java.util.concurrent.CompletableFuture;
-
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Slf4j
 @Service
@@ -31,6 +27,7 @@ public class DbServiceImpl implements DbService {
     private final DbMapper dbMapper;
     private final DbTokenService dbTokenService;
     private final JdbcTemplate jdbcTemplate;
+    private final DataSourceService dataSourceService;
 
     @Override
     public DbDto getById(long id) {
@@ -57,12 +54,23 @@ public class DbServiceImpl implements DbService {
     }
 
     @Override
+    @Transactional
     public void saveDb(DbDto dbDto) {
         if (existsByNameAndUsername(dbDto.getName(), dbDto.getUser().getUsername())) {
             log.warn("The user = [{}] already has db with name = [{}]", dbDto.getName(), dbDto.getUser().getUsername());
             throw new WrongDataException("The user already has db with name = [" + dbDto.getName() + "]");
         }
         DbEntity savedDbEntity = dbRepository.save(dbMapper.dtoToEntity(dbDto));
+        String dbTechName = "db_" + savedDbEntity.getId();
+        String roleName = "role_" + dbTechName;
+        jdbcTemplate.batchUpdate(
+                "CREATE DATABASE " + dbTechName + ";",
+                "USE " + dbTechName + ";",
+                "CREATE ROLE " + roleName + ";",
+                "GRANT SELECT, INSERT, UPDATE, DELETE ON SCHEMA SQLUser TO " + roleName + ";",
+                "GRANT " + roleName + " TO " + dbDto.getUser().getUsername() + ";",
+                "USE \"USER\";"
+        );
         CompletableFuture.runAsync(() ->
                 dbTokenService.create(savedDbEntity.getId(), dbDto.getToken().getLifeTime(), () -> true));
     }
@@ -87,10 +95,7 @@ public class DbServiceImpl implements DbService {
         if (!userHasRightsToDb(id, username)) {
             throw new WrongDataException("Can't remove db");
         }
-        DbEntity dbEntity = dbRepository.findById(id).get();
-        for (TableEntity table : dbEntity.getTables()) {
-            jdbcTemplate.update("DROP TABLE table_" + table.getId() + ";");
-        }
+        jdbcTemplate.update("DROP DATABASE db_" + id + ";");
         dbRepository.deleteById(id);
         log.info("Removed db with id = [{}]", id);
     }

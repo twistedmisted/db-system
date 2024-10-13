@@ -22,6 +22,9 @@ export class EditTableComponent implements OnInit {
   table!: Table;
   form!: FormGroup;
 
+  private tableId!: string;
+  private dbId!: string;
+
   constructor(
     private tableService: TableService,
     private activatedRoute: ActivatedRoute,
@@ -30,8 +33,12 @@ export class EditTableComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.tableId = this.activatedRoute.snapshot.paramMap.get('tableId')!;
+    this.dbId = this.activatedRoute.snapshot.paramMap.get('dbId')!;
+
     this.form = this.formBilder.group({
-      id: 0,
+      id: this.tableId,
+      dbId: this.dbId,
       name: [
         '',
         [
@@ -42,18 +49,14 @@ export class EditTableComponent implements OnInit {
       ],
     });
 
-    this.tableService
-      .getTableById(this.activatedRoute.snapshot.paramMap.get('tableId')!)
-      .subscribe((res) => {
-        this.table = res.result;
-      });
+    this.tableService.getTableById(this.tableId).subscribe((res) => {
+      this.table = res.result;
+    });
   }
 
   submit(): void {
-    const objectToSave = Object.assign({}, this.form.value, {
-      id: this.table.id!,
-    });
-    this.tableService.update(objectToSave).subscribe((res) => {
+    console.log(this.form.getRawValue());
+    this.tableService.update(this.form.getRawValue()).subscribe((res) => {
       this._location.back();
     });
   }

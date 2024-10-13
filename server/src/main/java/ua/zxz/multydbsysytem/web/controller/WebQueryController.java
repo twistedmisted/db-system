@@ -4,8 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ua.zxz.multydbsysytem.entity.TableEntity;
+import ua.zxz.multydbsysytem.exception.WrongDataException;
+import ua.zxz.multydbsysytem.repository.TableRepository;
 import ua.zxz.multydbsysytem.service.QueryService;
-import ua.zxz.multydbsysytem.service.TableService;
 import ua.zxz.multydbsysytem.web.payload.query.Condition;
 import ua.zxz.multydbsysytem.web.payload.query.UpdateQueryRequest;
 
@@ -20,7 +22,7 @@ import static org.springframework.http.HttpStatus.OK;
 @RequiredArgsConstructor
 public class WebQueryController {
 
-    private final TableService tableService;
+    private final TableRepository tableRepository;
     private final QueryService queryService;
 
     @GetMapping("/getByPK/{tableId}")
@@ -28,10 +30,12 @@ public class WebQueryController {
                                           @RequestParam String name,
                                           @RequestParam Object value,
                                           Principal principal) {
-        if (!tableService.hasRights(tableId, principal.getName())) {
+        TableEntity tableEntity = tableRepository.findById(tableId)
+                .orElseThrow(() -> new WrongDataException("Can't get table record"));
+        if (!tableEntity.getDb().getUser().getUsername().equals(principal.getName())) {
             return new ResponseEntity<>(Map.of("message", "Can't get table record"), HttpStatus.BAD_REQUEST);
         }
-        List<Object> records = queryService.getByColumn(tableId, new Condition(name, Condition.Operator.EQUALS, value));
+        List<Object> records = queryService.getByColumn(tableEntity, new Condition(name, Condition.Operator.EQUALS, value));
         if (records.isEmpty()) {
             return new ResponseEntity<>(Map.of("message", "Can't get table record"), HttpStatus.BAD_REQUEST);
         }
@@ -40,20 +44,24 @@ public class WebQueryController {
 
     @GetMapping("/getAll/{tableId}")
     public ResponseEntity<Object> getAll(@PathVariable Long tableId, Principal principal) {
-        if (tableService.hasRights(tableId, principal.getName())) {
-            return new ResponseEntity<>(queryService.getAll(tableId), HttpStatus.OK);
+        TableEntity tableEntity = tableRepository.findById(tableId)
+                .orElseThrow(() -> new WrongDataException("Can't get table content"));
+        if (!tableEntity.getDb().getUser().getUsername().equals(principal.getName())) {
+            return new ResponseEntity<>(Map.of("message", "Can't get table content"), HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(Map.of("message", "Can't get table content"), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(queryService.getAll(tableEntity), HttpStatus.OK);
     }
 
     @PostMapping("/save/{tableId}")
     public ResponseEntity<Object> save(@PathVariable Long tableId,
                                        @RequestBody Map<String, Object> object,
                                        Principal principal) {
-        if (!tableService.hasRights(tableId, principal.getName())) {
+        TableEntity tableEntity = tableRepository.findById(tableId)
+                .orElseThrow(() -> new WrongDataException("Can't save table record"));
+        if (!tableEntity.getDb().getUser().getUsername().equals(principal.getName())) {
             return new ResponseEntity<>(Map.of("message", "Can't save table record"), HttpStatus.BAD_REQUEST);
         }
-        queryService.save(tableId, object);
+        queryService.save(tableEntity, object);
         return new ResponseEntity<>(Map.of("message", "Record successfully saved"), OK);
     }
 
@@ -61,10 +69,12 @@ public class WebQueryController {
     public ResponseEntity<Object> update(@PathVariable Long tableId,
                                          @RequestBody UpdateQueryRequest updateQueryRequest,
                                          Principal principal) {
-        if (!tableService.hasRights(tableId, principal.getName())) {
+        TableEntity tableEntity = tableRepository.findById(tableId)
+                .orElseThrow(() -> new WrongDataException("Can't update table record"));
+        if (!tableEntity.getDb().getUser().getUsername().equals(principal.getName())) {
             return new ResponseEntity<>(Map.of("message", "Can't update table record"), HttpStatus.BAD_REQUEST);
         }
-        queryService.update(tableId, updateQueryRequest);
+        queryService.update(tableEntity, updateQueryRequest);
         return new ResponseEntity<>(Map.of("message", "Record updated"), OK);
     }
 
@@ -72,10 +82,12 @@ public class WebQueryController {
     public ResponseEntity<Object> delete(@PathVariable Long tableId,
                                          @RequestBody Map<String, Object> object,
                                          Principal principal) {
-        if (!tableService.hasRights(tableId, principal.getName())) {
+        TableEntity tableEntity = tableRepository.findById(tableId)
+                .orElseThrow(() -> new WrongDataException("Can't update table record"));
+        if (!tableEntity.getDb().getUser().getUsername().equals(principal.getName())) {
             return new ResponseEntity<>(Map.of("message", "Can't delete table record"), HttpStatus.BAD_REQUEST);
         }
-        queryService.delete(tableId, object);
+        queryService.delete(tableEntity, object);
         return new ResponseEntity<>(Map.of("message", "Record successfully deleted"), OK);
     }
 }
