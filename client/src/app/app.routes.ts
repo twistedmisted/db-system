@@ -16,6 +16,7 @@ import { TableContentComponent } from './components/table-content/table-content.
 import { AddDataComponent } from './components/add-data/add-data.component';
 import { EditDataComponent } from './components/edit-data/edit-data.component';
 import { AddConstraintComponent } from './components/add-constraint/add-constraint.component';
+import { ExecuteQueryComponent } from './components/execute-query/execute-query.component';
 
 export const routes: Routes = [
   {
@@ -81,6 +82,10 @@ export const routes: Routes = [
       {
         path: 'dbs/:dbId/tables/:tableId/addConstraint',
         component: AddConstraintComponent,
+      },
+      {
+        path: 'dbs/:dbId/execute',
+        component: ExecuteQueryComponent,
       },
     ],
   },

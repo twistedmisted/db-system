@@ -37,8 +37,8 @@ public class DataSourceService {
 
     // username_databaseName == dbName (in namespaces)
     // db_id
-    public JdbcTemplate getJdbcTemplateByDb(String dbName) {
-        return new JdbcTemplate(getDataSource(dbName));
+    public JdbcTemplate getJdbcTemplateByDb(Long dbId) {
+        return new JdbcTemplate(getDataSource("db_" + dbId));
     }
 
     private DataSource getDataSource(String dbName) {

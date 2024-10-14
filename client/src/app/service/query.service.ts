@@ -7,35 +7,39 @@ import { MessageResponse } from '../models/response/MessageResponse';
   providedIn: 'root',
 })
 export class QueryService {
-  constructor(private httpClient: HttpClient) {}
+  constructor(private http: HttpClient) {}
 
   getByPK(tableId: string, pkName: string, pkValue: any) {
-    return this.httpClient.get(BASE_URL + `/web-queries/getByPK/${tableId}`, {
+    return this.http.get(BASE_URL + `/web-queries/getByPK/${tableId}`, {
       params: { name: pkName, value: pkValue },
     });
   }
 
   getAll(tableId: string) {
-    return this.httpClient.get<[]>(BASE_URL + `/web-queries/getAll/${tableId}`);
+    return this.http.get<[]>(BASE_URL + `/web-queries/getAll/${tableId}`);
   }
 
   save(tableId: string, data: any) {
-    return this.httpClient.post<MessageResponse>(
+    return this.http.post<MessageResponse>(
       BASE_URL + `/web-queries/save/${tableId}`,
       data
     );
   }
 
   update(tableId: string, data: any) {
-    return this.httpClient.put<MessageResponse>(
+    return this.http.put<MessageResponse>(
       BASE_URL + `/web-queries/update/${tableId}`,
       data
     );
   }
 
   delete(tableId: string, rec: any) {
-    return this.httpClient.delete(BASE_URL + `/web-queries/delete/${tableId}`, {
+    return this.http.delete(BASE_URL + `/web-queries/delete/${tableId}`, {
       body: rec,
     });
+  }
+
+  executeCustomSelect(data: any) {
+    return this.http.post<[]>(BASE_URL + `/web-queries/execute`, data);
   }
 }

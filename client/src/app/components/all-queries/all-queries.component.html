@@ -1,0 +1,39 @@
+<div class="container mt-5">
+  <h2>Saved Queries</h2>
+
+  <div class="table-responsive">
+    <table class="table table-bordered table-striped">
+      <thead class="thead-light">
+        <tr>
+          <th>Query Name</th>
+          <th>SQL Query</th>
+          <th class="text-center">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="query-list">
+        <tr>
+          <td>Query 1</td>
+          <td>SELECT * FROM users;</td>
+          <td class="text-center actions">
+            <button class="btn btn-sm btn-primary me-2">Execute</button>
+            <button class="btn btn-sm btn-warning me-2">Edit</button>
+            <button class="btn btn-sm btn-danger">Delete</button>
+          </td>
+        </tr>
+        <tr>
+          <td>Query 2</td>
+          <td>INSERT INTO users (name, email) VALUES ('John', 'john.com');</td>
+          <td class="text-center actions">
+            <button class="btn btn-sm btn-primary me-2">Execute</button>
+            <button class="btn btn-sm btn-warning me-2">Edit</button>
+            <button class="btn btn-sm btn-danger">Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="mt-3">
+    <button class="btn btn-secondary" onclick="history.back()">Back</button>
+  </div>
+</div>

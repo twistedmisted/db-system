@@ -53,6 +53,9 @@ public class DbEntity {
     @OneToMany(mappedBy = "db", cascade = CascadeType.ALL)
     private List<TableEntity> tables = new ArrayList<>();
 
+    @OneToMany(mappedBy = "db", cascade = CascadeType.ALL)
+    private List<QueryEntity> queries = new ArrayList<>();
+
     public void addTable(TableEntity table) {
         table.setDb(this);
         tables.add(table);
