@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import ua.zxz.multydbsysytem.entity.TableEntity;
 import ua.zxz.multydbsysytem.exception.WrongDataException;
 import ua.zxz.multydbsysytem.repository.TableRepository;
+import ua.zxz.multydbsysytem.service.CustomQueryService;
 import ua.zxz.multydbsysytem.service.DbService;
 import ua.zxz.multydbsysytem.service.QueryService;
 import ua.zxz.multydbsysytem.web.payload.query.Condition;
@@ -26,6 +27,7 @@ public class WebQueryController {
   private final DbService dbService;
   private final TableRepository tableRepository;
   private final QueryService queryService;
+  private final CustomQueryService customQueryService;
 
   @GetMapping("/getByPK/{tableId}")
   public ResponseEntity<Object> getByPK(
@@ -116,6 +118,6 @@ public class WebQueryController {
     if (!dbService.userHasRightsToDb(req.getDbId(), principal.getName())) {
       return new ResponseEntity<>(Map.of("message", "Can't execute query"), HttpStatus.BAD_REQUEST);
     }
-    return new ResponseEntity<>(queryService.execute(req), OK);
+    return new ResponseEntity<>(customQueryService.execute(req), OK);
   }
 }

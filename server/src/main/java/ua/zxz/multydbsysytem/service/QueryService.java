@@ -30,8 +30,4 @@ public interface QueryService {
   void delete(TableEntity table, Map<String, Object> object);
 
   void delete(long dbId, String tableName, Condition condition);
-
-  Object execute(ExecuteQueryReq req);
-
-  void saveQuery(SaveQueryReq req);
 }

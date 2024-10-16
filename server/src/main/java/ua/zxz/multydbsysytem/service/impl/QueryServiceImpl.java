@@ -1,5 +1,8 @@
 package ua.zxz.multydbsysytem.service.impl;
 
+import java.sql.*;
+import java.util.*;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -10,13 +13,7 @@ import ua.zxz.multydbsysytem.repository.TableRepository;
 import ua.zxz.multydbsysytem.service.QueryService;
 import ua.zxz.multydbsysytem.service.TableService;
 import ua.zxz.multydbsysytem.web.payload.query.Condition;
-import ua.zxz.multydbsysytem.web.payload.query.ExecuteQueryReq;
-import ua.zxz.multydbsysytem.web.payload.query.SaveQueryReq;
 import ua.zxz.multydbsysytem.web.payload.query.UpdateQueryRequest;
-
-import java.sql.*;
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -26,7 +23,6 @@ public class QueryServiceImpl implements QueryService {
   private final TableService tableService;
   private final TableRepository tableRepository;
   private final JdbcTemplate jdbcTemplate;
-  private final DataSourceService dataSourceService;
 
   @Override
   public List<Object> getByColumn(TableEntity table, Condition condition) {
@@ -193,24 +189,5 @@ public class QueryServiceImpl implements QueryService {
             + condition.getOperator().toString()
             + "?",
         condition.getValue());
-  }
-
-  @Override
-  public Object execute(ExecuteQueryReq req) {
-    JdbcTemplate dbJdbcTemplate = dataSourceService.getJdbcTemplateByDb(req.getDbId());
-    return dbJdbcTemplate.query(
-        req.getQuery(),
-        rs -> {
-          List<Object> list = new ArrayList<>();
-          while (rs.next()) {
-            list.add(mapObject(rs));
-          }
-          return list;
-        });
-  }
-
-  @Override
-  public void saveQuery(SaveQueryReq req) {
-
   }
 }

@@ -6,6 +6,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.sql.DataSource;
@@ -39,6 +40,10 @@ public class DataSourceService {
     // db_id
     public JdbcTemplate getJdbcTemplateByDb(Long dbId) {
         return new JdbcTemplate(getDataSource("db_" + dbId));
+    }
+
+    public NamedParameterJdbcTemplate getNamedParameterJdbcTemplateByDb(Long dbId) {
+      return new NamedParameterJdbcTemplate(getDataSource("db_" + dbId));
     }
 
     private DataSource getDataSource(String dbName) {
