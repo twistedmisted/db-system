@@ -17,6 +17,7 @@ import { AddDataComponent } from './components/add-data/add-data.component';
 import { EditDataComponent } from './components/edit-data/edit-data.component';
 import { AddConstraintComponent } from './components/add-constraint/add-constraint.component';
 import { ExecuteQueryComponent } from './components/execute-query/execute-query.component';
+import { AllQueriesComponent } from './components/all-queries/all-queries.component';
 
 export const routes: Routes = [
   {
@@ -86,6 +87,10 @@ export const routes: Routes = [
       {
         path: 'dbs/:dbId/execute',
         component: ExecuteQueryComponent,
+      },
+      {
+        path: 'dbs/:dbId/customQueries',
+        component: AllQueriesComponent,
       },
     ],
   },
