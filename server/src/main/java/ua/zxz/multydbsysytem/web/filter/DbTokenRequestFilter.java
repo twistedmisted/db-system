@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,25 +23,30 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class DbTokenRequestFilter extends OncePerRequestFilter {
 
-    private final DbTokenService dbTokenService;
+  private final DbTokenService dbTokenService;
+  private final JdbcTemplate jdbcTemplate;
 
-    @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        final String header = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (header == null || !header.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-        final String token = header.substring(7);
-        final Long dbId = dbTokenService.validateTokenAndGetDbId(token);
-        if (Objects.isNull(dbId)) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-        final UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                dbId, null, List.of(new SimpleGrantedAuthority("QUERY")));
-        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        filterChain.doFilter(request, response);
+  @Override
+  protected void doFilterInternal(
+      HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+      throws ServletException, IOException {
+    final String header = request.getHeader(HttpHeaders.AUTHORIZATION);
+    if (header == null || !header.startsWith("Bearer ")) {
+      filterChain.doFilter(request, response);
+      return;
     }
+    final String token = header.substring(7);
+    jdbcTemplate.update("USE \"USER\";");
+    final Long dbId = dbTokenService.validateTokenAndGetDbId(token);
+    if (Objects.isNull(dbId)) {
+      filterChain.doFilter(request, response);
+      return;
+    }
+    final UsernamePasswordAuthenticationToken authentication =
+        new UsernamePasswordAuthenticationToken(
+            dbId, null, List.of(new SimpleGrantedAuthority("QUERY")));
+    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+    SecurityContextHolder.getContext().setAuthentication(authentication);
+    filterChain.doFilter(request, response);
+  }
 }

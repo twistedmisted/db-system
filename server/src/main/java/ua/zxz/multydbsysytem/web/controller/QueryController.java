@@ -24,7 +24,7 @@ public class QueryController {
   private final QueryService queryService;
   private final CustomQueryService customQueryService;
 
-  @GetMapping("/{tableName}/getByColumn")
+  @PostMapping("/{tableName}/getByColumn")
   public ResponseEntity<Object> getByColumn(
       @PathVariable("tableName") String tableName,
       @RequestBody Condition request,
@@ -36,7 +36,7 @@ public class QueryController {
     return new ResponseEntity<>(body, OK);
   }
 
-  @GetMapping("/{tableName}/getAll")
+  @GetMapping("/{tableName}")
   public ResponseEntity<Object> getById(
       @PathVariable("tableName") String tableName, Principal principal) {
     Map<String, Object> body = new HashMap<>();
@@ -44,7 +44,7 @@ public class QueryController {
     return new ResponseEntity<>(body, OK);
   }
 
-  @GetMapping("/custom/{queryName}")
+  @PostMapping("/custom/{queryName}")
   public ResponseEntity<Object> executeCustomQuery(
       @PathVariable("queryName") String queryName,
       @RequestBody Map<String, ?> request,
@@ -54,30 +54,30 @@ public class QueryController {
     return new ResponseEntity<>(body, OK);
   }
 
-  @PostMapping("/{tableName}/save")
+  @PostMapping("/{tableName}")
   public ResponseEntity<Object> save(
       @PathVariable("tableName") String tableName,
       @RequestBody Map<String, Object> object,
       Principal principal) {
     queryService.save(Long.parseLong(principal.getName()), tableName, object);
-    return new ResponseEntity<>(Map.of("result", "Saved"), OK);
+    return new ResponseEntity<>(Map.of("message", "Saved"), OK);
   }
 
-  @PutMapping("/{tableName}/update")
+  @PutMapping("/{tableName}")
   public ResponseEntity<Object> update(
       @PathVariable("tableName") String tableName,
       @RequestBody UpdateQueryRequest updateQueryRequest,
       Principal principal) {
     queryService.update(Long.parseLong(principal.getName()), tableName, updateQueryRequest);
-    return new ResponseEntity<>(Map.of("result", "Updated"), OK);
+    return new ResponseEntity<>(Map.of("message", "Updated"), OK);
   }
 
-  @DeleteMapping("/{tableName}/delete")
+  @DeleteMapping("/{tableName}")
   public ResponseEntity<Object> delete(
       @PathVariable("tableName") String tableName,
       @RequestBody Condition condition,
       Principal principal) {
     queryService.delete(Long.parseLong(principal.getName()), tableName, condition);
-    return new ResponseEntity<>(Map.of("result", "Removed"), OK);
+    return new ResponseEntity<>(Map.of("message", "Removed"), OK);
   }
 }

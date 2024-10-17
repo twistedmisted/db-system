@@ -176,8 +176,16 @@ public class QueryServiceImpl implements QueryService {
 
   @Override
   public void delete(long dbId, String tableName, Condition condition) {
-    TableEntity tableEntity = getTableEntity(dbId, tableName);
-    delete(tableEntity.getName(), condition);
+    setNamespace("db_" + dbId);
+    jdbcTemplate.update(
+        "DELETE FROM "
+            + tableName
+            + " WHERE "
+            + condition.getColumnName()
+            + condition.getOperator().toString()
+            + "?",
+        condition.getValue());
+    setNamespace("\"USER\"");
   }
 
   private void delete(String tableName, Condition condition) {
