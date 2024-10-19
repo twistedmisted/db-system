@@ -17,12 +17,13 @@ public class ColumnType {
     public enum Type {
         INT("INTEGER"),
         BIGINT("BIGINT"),
-        FLOAT("FLOAT"),
+//        FLOAT("FLOAT"),
         DOUBLE("DOUBLE"),
         CHAR("CHAR"),
         VARCHAR("VARCHAR"),
         //        BLOB("BLOB"),
         BOOLEAN("BIT"),
+        DATE("DATE"),
         DATETIME("DATETIME"),
         TIME("TIME"),
         TIMESTAMP("TIMESTAMP");

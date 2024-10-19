@@ -79,6 +79,7 @@ export class ExecuteQueryComponent {
     this.queryService
       .executeCustomSelect(this.form.getRawValue())
       .subscribe((res) => {
+        console.log(res);
         this.columnsNames = Object.getOwnPropertyNames(res.at(0));
         this.content = res;
       });

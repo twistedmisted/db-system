@@ -6,6 +6,8 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Service;
 import ua.zxz.multydbsysytem.entity.TableEntity;
 import ua.zxz.multydbsysytem.exception.WrongDataException;
@@ -98,28 +100,30 @@ public class QueryServiceImpl implements QueryService {
   }
 
   @Override
-  public void save(TableEntity table, Map<String, Object> object) {
+  public Number save(TableEntity table, Map<String, Object> object) {
     setNamespace("db_" + table.getDb().getId());
     String columns = String.join(" = ?, ", object.keySet()) + " = ?";
+    KeyHolder keyHolder = new GeneratedKeyHolder();
     jdbcTemplate.update(
         con -> {
           PreparedStatement ps =
               con.prepareStatement(
-                  String.format("INSERT INTO " + table.getName() + " SET %s;", columns));
+                  String.format("INSERT INTO " + table.getName() + " SET %s;", columns), Statement.RETURN_GENERATED_KEYS);
           int index = 1;
           for (Object v : object.values()) {
             ps.setObject(index, v);
             index++;
           }
           return ps;
-        });
+        }, keyHolder);
     setNamespace("\"USER\"");
+    return keyHolder.getKey();
   }
 
   @Override
-  public void save(long dbId, String tableName, Map<String, Object> object) {
+  public Number save(long dbId, String tableName, Map<String, Object> object) {
     TableEntity tableEntity = getTableEntity(dbId, tableName);
-    save(tableEntity, object);
+    return save(tableEntity, object);
   }
 
   @Override

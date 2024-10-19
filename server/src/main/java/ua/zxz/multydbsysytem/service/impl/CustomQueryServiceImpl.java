@@ -113,7 +113,13 @@ public class CustomQueryServiceImpl implements CustomQueryService {
     String sql = queryRepository
         .getQueryByDbIdAndQueryName(dbId, queryName)
         .orElseThrow(() -> new WrongDataException("Can't find query by name for this db"));
-    return dbJdbcTemplate.queryForList(sql, request);
+    return dbJdbcTemplate.query(sql, request, rs -> {
+      List<Object> list = new ArrayList<>();
+      while (rs.next()) {
+        list.add(mapObject(rs));
+      }
+      return list;
+    });
   }
 
   private Map<String, Object> mapObject(ResultSet rs) throws SQLException {
@@ -121,7 +127,7 @@ public class CustomQueryServiceImpl implements CustomQueryService {
     ResultSetMetaData metaData = rs.getMetaData();
     int columnCount = metaData.getColumnCount();
     for (int i = 1; i <= columnCount; i++) {
-      data.put(metaData.getColumnName(i), rs.getObject(i));
+      data.put(metaData.getTableName(i) + "." + metaData.getColumnName(i), rs.getObject(i));
     }
     return data;
   }

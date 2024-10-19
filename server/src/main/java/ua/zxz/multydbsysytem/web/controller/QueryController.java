@@ -50,7 +50,10 @@ public class QueryController {
       @RequestBody Map<String, ?> request,
       Principal principal) {
     Map<String, Object> body = new HashMap<>();
-    body.put("objects", customQueryService.executeCustomQuery(Long.parseLong(principal.getName()), queryName, request));
+    body.put(
+        "objects",
+        customQueryService.executeCustomQuery(
+            Long.parseLong(principal.getName()), queryName, request));
     return new ResponseEntity<>(body, OK);
   }
 
@@ -59,8 +62,9 @@ public class QueryController {
       @PathVariable("tableName") String tableName,
       @RequestBody Map<String, Object> object,
       Principal principal) {
-    queryService.save(Long.parseLong(principal.getName()), tableName, object);
-    return new ResponseEntity<>(Map.of("message", "Saved"), OK);
+    return new ResponseEntity<>(
+        Map.of("key", queryService.save(Long.parseLong(principal.getName()), tableName, object)),
+        OK);
   }
 
   @PutMapping("/{tableName}")

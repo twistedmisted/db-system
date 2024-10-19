@@ -246,10 +246,8 @@ GET http://localhost:8080/fieldTypes
 GET http://localhost:8080/constraints
 
 ### CUSTOM QUERY
-GET {{host}}/queries/custom/testQuery
+POST {{host}}/queries/custom/selectAllItems
 Content-Type: application/json
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxOSIsImV4cCI6MTczMTQyMjM2OX0.jcAh-U0AX2_Xkj1WIwvUMNbKnwff1TbhiU2Yfc1XgKJW5jmmNA9UWbg-a3GzfUYGMPC2E4TxqS7cH_8dY1VFqw
 
-{
-  "ids": [6]
-}
+{}
