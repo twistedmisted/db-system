@@ -2,6 +2,7 @@ package ua.zxz.multydbsysytem.service;
 
 import ua.zxz.multydbsysytem.dto.DbDto;
 import ua.zxz.multydbsysytem.dto.PageDto;
+import ua.zxz.multydbsysytem.web.payload.DbUpdateRequest;
 
 public interface DbService {
 
@@ -18,4 +19,6 @@ public interface DbService {
     boolean userHasRightsToDb(long dbId, String username);
 
     boolean dbAlreadyHasTableWithName(long dbId, String table);
+
+  void updateDb(Long id, DbUpdateRequest dbCreateRequest, String name);
 }

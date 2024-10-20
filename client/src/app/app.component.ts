@@ -4,7 +4,7 @@ import { NavComponent } from './components/nav/nav.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { LoginComponent } from './components/login/login.component';
 import { CommonModule } from '@angular/common';
-import { MessageComponent } from './components/message/message.component';
+import { ToastsContainerComponent } from './components/toasts-container/toasts-container.component';
 
 @Component({
   selector: 'app-root',
@@ -16,7 +16,7 @@ import { MessageComponent } from './components/message/message.component';
     ReactiveFormsModule,
     LoginComponent,
     CommonModule,
-    MessageComponent,
+    ToastsContainerComponent,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',

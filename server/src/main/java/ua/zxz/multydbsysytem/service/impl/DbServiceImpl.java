@@ -15,6 +15,7 @@ import ua.zxz.multydbsysytem.mapper.impl.DbMapper;
 import ua.zxz.multydbsysytem.repository.DbRepository;
 import ua.zxz.multydbsysytem.service.DbService;
 import ua.zxz.multydbsysytem.service.DbTokenService;
+import ua.zxz.multydbsysytem.web.payload.DbUpdateRequest;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -79,6 +80,10 @@ public class DbServiceImpl implements DbService {
         return dbRepository.existsByNameAndUserUsername(name, username);
     }
 
+    private boolean existsByIdAndUsername(Long dbId, String username) {
+      return dbRepository.existsByIdAndUserUsername(dbId, username);
+    }
+
     @Override
     public void updateDb(DbDto dbDto) {
         if (!existsByNameAndUsername(dbDto.getName(), dbDto.getUser().getUsername())) {
@@ -87,7 +92,7 @@ public class DbServiceImpl implements DbService {
         }
         DbEntity dbEntity = dbRepository.findById(dbDto.getId()).get();
         dbEntity.setName(dbDto.getName());
-        dbRepository.save(dbMapper.dtoToEntity(dbDto));
+        dbRepository.save(dbEntity);
     }
 
     @Override
@@ -108,4 +113,15 @@ public class DbServiceImpl implements DbService {
     public boolean dbAlreadyHasTableWithName(long dbId, String table) {
         return dbRepository.existsByIdAndTablesName(dbId, table);
     }
+
+  @Override
+  public void updateDb(Long id, DbUpdateRequest dbCreateRequest, String username) {
+    if (!existsByIdAndUsername(id, username)) {
+      log.warn("The user = [{}] does not have db with id = [{}]", id, username);
+      throw new WrongDataException("Can't change the db name");
+    }
+    DbEntity dbEntity = dbRepository.findById(id).get();
+    dbEntity.setName(dbCreateRequest.getDbName());
+    dbRepository.save(dbEntity);
+  }
 }

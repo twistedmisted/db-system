@@ -5,6 +5,7 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { TableListComponent } from '../table-list/table-list.component';
 import { CommonModule } from '@angular/common';
 import { DbTokenInfoComponent } from '../db-token-info/db-token-info.component';
+import { AllQueriesComponent } from '../all-queries/all-queries.component';
 
 @Component({
   selector: 'app-db',
@@ -15,6 +16,7 @@ import { DbTokenInfoComponent } from '../db-token-info/db-token-info.component';
     RouterModule,
     DbTokenInfoComponent,
     DbTokenInfoComponent,
+    AllQueriesComponent,
   ],
   templateUrl: './db.component.html',
   styleUrl: './db.component.scss',

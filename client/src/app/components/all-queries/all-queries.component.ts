@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { CustomQueryService } from '../../service/customquery.service';
 import { CustomQuery } from '../../models/customquery.model';
 import { ActivatedRoute, RouterModule } from '@angular/router';
@@ -13,18 +13,20 @@ import { MessageService } from '../../service/message.service';
   styleUrl: './all-queries.component.scss',
 })
 export class AllQueriesComponent implements OnInit {
+  @Input() preview: boolean = false;
+  @Input() dbId!: string;
   queries!: CustomQuery[];
-  dbId: string;
 
   constructor(
     private customQueryService: CustomQueryService,
     private messageService: MessageService,
     private activatedRoute: ActivatedRoute
-  ) {
-    this.dbId = this.activatedRoute.snapshot.paramMap.get('dbId')!;
-  }
+  ) {}
 
   ngOnInit(): void {
+    if (!this.preview) {
+      this.dbId = this.activatedRoute.snapshot.paramMap.get('dbId')!;
+    }
     this.customQueryService.getAll(this.dbId).subscribe((res) => {
       this.queries = res.result;
     });

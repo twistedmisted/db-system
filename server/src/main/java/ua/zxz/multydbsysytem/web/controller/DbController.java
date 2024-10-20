@@ -17,6 +17,7 @@ import ua.zxz.multydbsysytem.dto.DbTokenDto;
 import ua.zxz.multydbsysytem.dto.UserDto;
 import ua.zxz.multydbsysytem.service.DbService;
 import ua.zxz.multydbsysytem.web.payload.DbCreateRequest;
+import ua.zxz.multydbsysytem.web.payload.DbUpdateRequest;
 
 import java.security.Principal;
 import java.sql.Timestamp;
@@ -56,13 +57,9 @@ public class DbController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Object> update(@PathVariable Long id,
-                                         @Valid @RequestBody DbCreateRequest dbCreateRequest,
+                                         @Valid @RequestBody DbUpdateRequest dbCreateRequest,
                                          Principal principal) {
-        DbDto dbDto = new DbDto();
-        dbDto.setId(id);
-        dbDto.setName(dbCreateRequest.getDbName());
-        dbDto.setUser(new UserDto(principal.getName()));
-        dbService.updateDb(dbDto);
+        dbService.updateDb(id, dbCreateRequest, principal.getName());
         return new ResponseEntity<>(OK);
     }
 

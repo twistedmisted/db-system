@@ -34,6 +34,7 @@ export class ErrorBlockComponent implements OnInit, OnDestroy {
       ...this.errorClasses,
       show: false,
     };
+    this.messages = null;
   }
 
   ngOnInit(): void {

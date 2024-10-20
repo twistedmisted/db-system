@@ -1,53 +1,103 @@
-<div class="container mt-5">
-  <div class="mb-3">
-    <button class="btn btn-secondary" onclick="history.back()">Back</button>
-  </div>
-
-  <div class="card">
-    <div class="card-header d-flex justify-content-between align-items-center">
-      <h3 class="card-title">Custom Queries</h3>
-      <div>
-        <a
-          class="btn btn-success me-2"
-          [routerLink]="['/dbs/', dbId, 'execute']"
-          >Add New Query</a
-        >
-      </div>
-    </div>
-
-    <div *ngIf="queries" class="card-body">
-      <div class="table-responsive">
-        <table class="table table-bordered table-striped">
-          <thead class="thead-light">
-            <tr>
-              <th>Query Name</th>
-              <th>SQL Query</th>
-              <th class="text-center">Actions</th>
-            </tr>
-          </thead>
-          <tbody id="query-list">
-            <tr *ngFor="let query of queries">
-              <td>{{ query.queryName }}</td>
-              <td>{{ query.query }}</td>
-              <td class="text-center actions">
-                <a
-                  class="btn btn-sm btn-primary me-2"
-                  [routerLink]="['/dbs', dbId, 'execute']"
-                  [state]="{ queryId: query.id }"
-                >
-                  Execute/Edit
-                </a>
-                <button
-                  class="btn btn-sm btn-danger"
-                  (click)="deleteQuery(query.id)"
-                >
-                  Delete
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+<ng-container *ngIf="preview; else allList">
+  <h4 class="mb-3">Custom Queries</h4>
+  <div *ngIf="queries">
+    <div class="table-responsive">
+      <table class="table table-bordered">
+        <thead class="thead-light">
+          <tr>
+            <th>Query Name</th>
+            <th>SQL Query</th>
+            <th class="text-center">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="query-list">
+          <tr *ngFor="let query of queries | slice : 0 : 10; let i = index">
+            <td>{{ query.queryName }}</td>
+            <td>{{ query.query }}</td>
+            <td class="text-center actions">
+              <a
+                class="btn btn-sm btn-primary me-2"
+                [routerLink]="['/dbs', dbId, 'execute']"
+                [state]="{ queryId: query.id }"
+              >
+                Execute/Edit
+              </a>
+              <button
+                class="btn btn-sm btn-danger"
+                (click)="deleteQuery(query.id)"
+              >
+                Delete
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="queries.length !== 0" class="text-center">
+            <td colspan="3">
+              <a [routerLink]="['customQueries']">View All</a>
+            </td>
+          </tr>
+          <tr *ngIf="!queries || queries.length === 0" class="text-center">
+            <td colspan="3">Empty...</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
-</div>
+</ng-container>
+
+<ng-template #allList>
+  <div class="container mt-5">
+    <div class="mb-3">
+      <button class="btn btn-secondary" onclick="history.back()">Back</button>
+    </div>
+
+    <div class="card">
+      <div
+        class="card-header d-flex justify-content-between align-items-center"
+      >
+        <h3 class="card-title">Custom Queries</h3>
+        <div>
+          <a
+            class="btn btn-success me-2"
+            [routerLink]="['/dbs/', dbId, 'execute']"
+            >Add New Query</a
+          >
+        </div>
+      </div>
+
+      <div *ngIf="queries" class="card-body">
+        <div class="table-responsive">
+          <table class="table table-bordered table-striped">
+            <thead class="thead-light">
+              <tr>
+                <th>Query Name</th>
+                <th>SQL Query</th>
+                <th class="text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="query-list">
+              <tr *ngFor="let query of queries">
+                <td>{{ query.queryName }}</td>
+                <td>{{ query.query }}</td>
+                <td class="text-center actions">
+                  <a
+                    class="btn btn-sm btn-primary me-2"
+                    [routerLink]="['/dbs', dbId, 'execute']"
+                    [state]="{ queryId: query.id }"
+                  >
+                    Execute/Edit
+                  </a>
+                  <button
+                    class="btn btn-sm btn-danger"
+                    (click)="deleteQuery(query.id)"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>

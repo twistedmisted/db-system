@@ -1,26 +1,26 @@
-import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
+import { inject, Injectable } from '@angular/core';
+import { ToastService } from './toast.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class MessageService {
-  error$ = new Subject<string[]>();
-  success$ = new Subject<string>();
+  toastService: ToastService = inject(ToastService);
 
   openError(msg: string[]) {
-    this.error$.next(msg);
+    this.toastService.show({
+      nameTpl: 'danger',
+      message: msg[0],
+      classname: 'bg-danger text-light',
+      delay: 15000,
+    });
   }
 
   openSuccess(msg: string) {
-    this.success$.next(msg);
-  }
-
-  getError(): Subject<string[]> {
-    return this.error$;
-  }
-
-  getSuccess(): Subject<string> {
-    return this.success$;
+    this.toastService.show({
+      nameTpl: 'success',
+      message: msg,
+      classname: 'bg-success text-light',
+    });
   }
 }

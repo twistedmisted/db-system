@@ -20,16 +20,27 @@
     >
       <div class="accordion-body">
         <h6>URL:</h6>
-        <code>GET {{ getByFieldLink }}</code>
+        <code>POST {{ getByFieldLink }}</code>
         <h6>Header:</h6>
-        <code>'Authorization': Bearer &#123;yours access token&#125;</code>
-        <h6>General Request Example :</h6>
+        <code
+          >'Authorization': Bearer &#123; &#123;yours access token&#125;
+          &#125;</code
+        >
+        <h6>General Request Example:</h6>
         <pre>
 <code>
 &#123;
-    "columnName": &#123;columnName&#125;,
-    "value": &#123;value&#125;,
-    "operator": &#123;One of: EQUALS, NOT_EQUALS, GREATER, LOWER &#125;
+    "columnName": &#123; &#123;columnName&#125; &#125;,
+    "value": &#123; &#123;value&#125; &#125;,
+    "operator": &#123; &#123;One of: EQUALS, NOT_EQUALS, GREATER, LOWER&#125; &#125;
+&#125;
+</code>
+        </pre>
+        <h6>General Response Example:</h6>
+        <pre>
+<code>
+&#123;
+    "objects": &#123;...&#125;
 &#125;
 </code>
         </pre>
@@ -60,11 +71,26 @@
         <h6>URL:</h6>
         <code>GET {{ getAllLink }}</code>
         <h6>Header:</h6>
-        <code>'Authorization': Bearer &#123;yours access token&#125;</code>
+        <code
+          >'Authorization': Bearer &#123; &#123;yours access token&#125;
+          &#125;</code
+        >
         <h6>General Request Example :</h6>
         <pre>
 <code>
 N/A (No request body required)
+</code>
+        </pre>
+        <h6>General Response Example:</h6>
+        <pre>
+<code>
+&#123;
+    "objects": [
+      &#123;...&#125;,
+      ..., 
+      &#123;...&#125;
+    ]
+&#125;
 </code>
         </pre>
       </div>
@@ -94,14 +120,25 @@ N/A (No request body required)
         <h6>URL:</h6>
         <code>POST {{ createLink }}</code>
         <h6>Header:</h6>
-        <code>'Authorization': Bearer &#123;yours access token&#125;</code>
+        <code
+          >'Authorization': Bearer &#123; &#123;yours access token&#125;
+          &#125;</code
+        >
         <h6>General Request Example :</h6>
         <pre>
 <code>
 &#123;
-    "columnName1": &#123;value1&#125;,
+    "columnName1": &#123; &#123;value1&#125; &#125;,
     ...
-    "columnNameN": &#123;valueN&#125;
+    "columnNameN": &#123; &#123;valueN&#125; &#125;
+&#125;
+</code>
+        </pre>
+        <h6>General Response Example:</h6>
+        <pre>
+<code>
+&#123;
+    "key": &#123; &#123;generated key (id) &#125; &#125;
 &#125;
 </code>
         </pre>
@@ -132,21 +169,32 @@ N/A (No request body required)
         <h6>URL:</h6>
         <code>PUT {{ updateLink }}</code>
         <h6>Header:</h6>
-        <code>'Authorization': Bearer &#123;yours access token&#125;</code>
+        <code
+          >'Authorization': Bearer &#123; &#123;yours access token&#125;
+          &#125;</code
+        >
         <h6>General Request Example :</h6>
         <pre>
 <code>
 &#123;
     "condition": &#123;
-        "columnName": &#123;columnName&#125;,
-        "value": &#123;value&#125;,
-        "operator": &#123;One of: EQUALS, NOT_EQUALS, GREATER, LOWER &#125;
+        "columnName": &#123; &#123;columnName&#125; &#125;,
+        "value": &#123; &#123;value&#125; &#125;,
+        "operator": &#123; &#123;One of: EQUALS, NOT_EQUALS, GREATER, LOWER&#125; &#125;
     &#125;,
     "object": &#123;
-        "columnName1": &#123;value1&#125;,
+        "columnName1": &#123; &#123;value1&#125; &#125;,
         ...
-        "columnNameN": &#123;valueN&#125;
+        "columnNameN": &#123; &#123;valueN&#125; &#125;
     &#125;
+&#125;
+</code>
+        </pre>
+        <h6>General Response Example:</h6>
+        <pre>
+<code>
+&#123;
+    "message": "Updated"
 &#125;
 </code>
         </pre>
@@ -177,14 +225,25 @@ N/A (No request body required)
         <h6>URL:</h6>
         <code>DELETE {{ deleteLink }}</code>
         <h6>Header:</h6>
-        <code>'Authorization': Bearer &#123;yours access token&#125;</code>
+        <code
+          >'Authorization': Bearer &#123; &#123;yours access token&#125;
+          &#125;</code
+        >
         <h6>General Request Example :</h6>
         <pre>
 <code>
 &#123;
-    "columnName": &#123;columnName&#125;,
-    "value": &#123;value&#125;,
-    "operator": &#123;One of: EQUALS, NOT EQUALS, GREATER, LOWER &#125;
+    "columnName": &#123; &#123;columnName&#125; &#125;,
+    "value": &#123; &#123;value&#125; &#125;,
+    "operator": &#123; &#123;One of: EQUALS, NOT EQUALS, GREATER, LOWER&#125; &#125;
+&#125;
+</code>
+        </pre>
+        <h6>General Response Example:</h6>
+        <pre>
+<code>
+&#123;
+    "message": "Removed"
 &#125;
 </code>
         </pre>

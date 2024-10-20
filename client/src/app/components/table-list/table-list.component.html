@@ -1,12 +1,5 @@
-<div class="d-flex justify-content-between align-items-center mb-3">
-  <h5>Tables</h5>
-  <a
-    [routerLink]="['/tables/create']"
-    [state]="{ dbId: dbId }"
-    class="btn btn-success"
-  >
-    Create Table
-  </a>
+<div class="mb-3">
+  <h4>Tables</h4>
 </div>
 
 <div>
@@ -31,6 +24,12 @@
             </td>
           </tr>
         </ng-container>
+        <tr
+          *ngIf="tables === null || tables === undefined || tables.length === 0"
+          class="text-center"
+        >
+          <td colspan="2">Empty...</td>
+        </tr>
       </tbody>
     </table>
   </div>

@@ -59,13 +59,13 @@
                 />
               </th>
               <td class="text-center align-middle">
-                  <app-column-types
-                    [options]="fieldTypes$.getValue()"
-                    [column]="column"
-                    [index]="i"
-                    [tableId]="tableId"
-                    [columnName]="column.name"
-                  ></app-column-types>
+                <app-column-types
+                  [options]="fieldTypes$.getValue()"
+                  [column]="column"
+                  [index]="i"
+                  [tableId]="tableId"
+                  [columnName]="column.name"
+                ></app-column-types>
               </td>
               <td class="align-middle">
                 <app-constraint-list
@@ -122,3 +122,5 @@
     readonly
   />
 </ng-template>
+
+<ng-template #testTempl> I'm a success toast </ng-template>

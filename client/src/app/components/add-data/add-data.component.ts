@@ -95,13 +95,13 @@ export class AddDataComponent implements OnInit {
       return false;
     }
 
-    if (!isNaN(parseInt(value, 10)) && Number.isInteger(parseFloat(value))) {
-      return parseInt(value, 10);
-    }
+    // if (!isNaN(parseInt(value, 10)) && Number.isInteger(parseFloat(value))) {
+    //   return parseInt(value, 10);
+    // }
 
-    if (!isNaN(parseFloat(value))) {
-      return parseFloat(value);
-    }
+    // if (!isNaN(parseFloat(value))) {
+    //   return parseFloat(value);
+    // }
 
     return value;
   }
